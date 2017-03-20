@@ -1,0 +1,512 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta name="baidu-site-verification" content="GliC1jSe3E" />
+  
+    <title>修改回到顶部按钮 | iDanCy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Deen12520">
+    
+    <meta name="description" content="回到顶部按钮前言最近学习使用Hexo搭建了一个博客，theme 使用的是geekman(在jakman基础修改的一个版本)。
+在博客中加入了回到顶部，偶然一次看到Hexo 折腾笔记中的回到顶部的百分比样式的按钮效果，很炫酷，所以自己动手照着教程造了轮子，具体效果可进本人博客查看 iDanCy。
+这里">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="iDanCy" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="iDanCy" title="iDanCy"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="iDanCy">iDanCy</a></h1>
+				<h2 class="blog-motto">Nothing is more.</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+				    <form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+					<label>Search</label>
+					<input type="text" id="search" class="st-default-search-input" maxlength="20" placeholder="Search" />
+				    </form>
+
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/03/20/修改回到顶部按钮/" title="修改回到顶部按钮" itemprop="url">修改回到顶部按钮</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://deen12520.github.io/about" title="Deen12520" target="_blank" itemprop="author">Deen12520</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-20T03:04:47.000Z" itemprop="datePublished"> Published 2017-03-20</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#回到顶部按钮"><span class="toc-number">1.</span> <span class="toc-text">回到顶部按钮</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#环境"><span class="toc-number">1.2.</span> <span class="toc-text">环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#步骤"><span class="toc-number">1.3.</span> <span class="toc-text">步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-修改主题下css对应的totop-styl文"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.修改主题下css对应的totop.styl文</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-修改layout下的totop-ejs"><span class="toc-number">1.3.2.</span> <span class="toc-text">2.修改layout下的totop.ejs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-修改js下的totop-js"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.修改js下的totop.js</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="回到顶部按钮"><a href="#回到顶部按钮" class="headerlink" title="回到顶部按钮"></a><strong>回到顶部按钮</strong></h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a><strong>前言</strong></h3><p>最近学习使用Hexo搭建了一个<a href="https://deen12520.github.io">博客</a>，theme 使用的是<a href="https://github.com/Deen12520/geekman" target="_blank" rel="external">geekman</a>(在jakman基础修改的一个版本)。</p>
+<p>在博客中加入了回到顶部，偶然一次看到<a href="https://unnamed42.github.io/2016-09-10-Hexo%E6%8A%98%E8%85%BE%E7%AC%94%E8%AE%B0.html" target="_blank" rel="external">Hexo 折腾笔记</a>中的回到顶部的百分比样式的按钮效果，很炫酷，所以自己动手照着教程造了轮子，具体效果可进本人博客查看 <a href="https://deen12520.github.io/">iDanCy</a>。</p>
+<p>这里我主要针对自己的主题做出修改，可能不适用其他主题。这个按钮是一个圆形按钮，有一个实时更新的圆形进度条显示你当前阅读进度，但反应相对有些慢（逃。</p>
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a><strong>环境</strong></h3><p>window7 32bit,   hexo 3,  geekman</p>
+<p>使用本方法，请核对环境是否和我的一致。本方法只在geekman主题测试。</p>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a><strong>步骤</strong></h3><h4 id="1-修改主题下css对应的totop-styl文"><a href="#1-修改主题下css对应的totop-styl文" class="headerlink" title="1.修改主题下css对应的totop.styl文"></a>1.修改主题下css对应的totop.styl文</h4><p>如下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">#backtoTop &#123;</div><div class="line">    background-color: #eee;</div><div class="line">    border-radius: 100%;</div><div class="line">    bottom: 5%;</div><div class="line">    height: 48px;</div><div class="line">    width: 48px;</div><div class="line">    position: fixed;</div><div class="line">    right: -100px;</div><div class="line">    z-index: 99;</div><div class="line">    -webkit-transition: 0.5s;</div><div class="line">       -moz-transition: 0.5s;</div><div class="line">            transition: 0.5s;</div><div class="line">    &amp;.display &#123;right: 10px;&#125;</div><div class="line">&#125;</div><div class="line">.percentage &#123;</div><div class="line">    font-size: 16px;</div><div class="line">    height: 48px;</div><div class="line">    line-height: 48px;</div><div class="line">    position: absolute;</div><div class="line">    text-align: center;</div><div class="line">    top: 0;</div><div class="line">    width: 48px;</div><div class="line">    color: #555;</div><div class="line">    cursor: pointer;</div><div class="line">    &amp;:before &#123;content:attr(data-percent);&#125;</div><div class="line">    &amp;:hover:before &#123;content:"↑";font-size:20px&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="2-修改layout下的totop-ejs"><a href="#2-修改layout下的totop-ejs" class="headerlink" title="2.修改layout下的totop.ejs"></a>2.修改layout下的totop.ejs</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;% if (theme.totop)&#123; %&gt;</div><div class="line">&lt;div id=&quot;backtoTop&quot; data-action=&quot;gototop&quot; title=&quot;&lt;%- __(&apos;to_top&apos;) %&gt;&quot;&gt;</div><div class="line">    &lt;canvas id=&quot;backtoTopCanvas&quot; width=&quot;48&quot; height=&quot;48&quot;&gt;&lt;/canvas&gt;</div><div class="line">    &lt;div class=&quot;percentage&quot;&gt;&lt;/div&gt;</div><div class="line">    &lt;script src=&quot;&lt;%- config.root %&gt;js/totop.js&quot;&gt;&lt;/script&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;% &#125; %&gt;</div></pre></td></tr></table></figure>
+<h4 id="3-修改js下的totop-js"><a href="#3-修改js下的totop-js" class="headerlink" title="3.修改js下的totop.js"></a>3.修改js下的totop.js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line">var bigfa_scroll = &#123;</div><div class="line">    drawCircle: function(id, percentage, color) &#123;</div><div class="line">        var width = $(id).width();</div><div class="line">        var height = $(id).height();</div><div class="line">        var radius = parseInt(width / 2.20);</div><div class="line">        var position = width;</div><div class="line">        var positionBy2 = position / 2;</div><div class="line">        var bg = $(id)[0];</div><div class="line">        id = id.split(&quot;#&quot;);</div><div class="line">        var ctx = bg.getContext(&quot;2d&quot;);</div><div class="line">        var imd = null;</div><div class="line">        var circ = Math.PI * 2;</div><div class="line">        var quart = Math.PI / 2;</div><div class="line">        ctx.clearRect(0, 0, width, height);</div><div class="line">        ctx.beginPath();</div><div class="line">        ctx.strokeStyle = color;</div><div class="line">        ctx.lineCap = &quot;square&quot;;</div><div class="line">        ctx.closePath();</div><div class="line">        ctx.fill();</div><div class="line">        ctx.lineWidth = 3;</div><div class="line">        imd = ctx.getImageData(0, 0, position, position);</div><div class="line">        var draw = function(current, ctxPass) &#123;</div><div class="line">            ctxPass.putImageData(imd, 0, 0);</div><div class="line">            ctxPass.beginPath();</div><div class="line">            ctxPass.arc(positionBy2, positionBy2, radius, -(quart), ((circ) * current) - quart, false);</div><div class="line">            ctxPass.stroke();</div><div class="line">        &#125;</div><div class="line">        draw(percentage / 100, ctx);</div><div class="line">    &#125;,</div><div class="line">    backToTop: function($this) &#123;</div><div class="line">        $this.click(function() &#123;</div><div class="line">            $(&quot;body,html&quot;).animate(&#123;</div><div class="line">                scrollTop: 0</div><div class="line">            &#125;,</div><div class="line">            800);</div><div class="line">            return false;</div><div class="line">        &#125;);</div><div class="line">    &#125;,</div><div class="line">    scrollHook: function($this, color) &#123;</div><div class="line">        color = color ? color: &quot;#000000&quot;;</div><div class="line">        $this.scroll(function() &#123;</div><div class="line">            var docHeight = ($(document).height() - $(window).height()),</div><div class="line">            $windowObj = $this,</div><div class="line">            $per = $(&quot;.percentage&quot;),</div><div class="line">            percentage = 0;</div><div class="line">            defaultScroll = $windowObj.scrollTop();</div><div class="line">            percentage = parseInt((defaultScroll / docHeight) * 100);</div><div class="line">            var backToTop = $(&quot;#backtoTop&quot;);</div><div class="line">            if (backToTop.length &gt; 0) &#123;</div><div class="line">                if ($windowObj.scrollTop() &gt; 200) &#123;</div><div class="line">                    backToTop.addClass(&quot;display&quot;);</div><div class="line">                &#125; else &#123;</div><div class="line">                    backToTop.removeClass(&quot;display&quot;);</div><div class="line">                &#125;</div><div class="line">                $per.attr(&quot;data-percent&quot;, percentage);</div><div class="line">                bigfa_scroll.drawCircle(&quot;#backtoTopCanvas&quot;, percentage, color);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">$(document).ready(function() &#123;</div><div class="line">    var T = bigfa_scroll,</div><div class="line">        totop = $(&quot;#backtoTop&quot;),</div><div class="line">        percent = totop.children(&quot;.percentage&quot;);</div><div class="line">    T.backToTop(totop);</div><div class="line">    T.scrollHook($(window), &quot;#99ccff&quot;);</div><div class="line">    percent.hover(function()&#123;</div><div class="line">        percent.addClass(&quot;fa-long-arrow-up&quot;);</div><div class="line">        percent.css(&#123;&quot;font-family&quot;:&quot;FontAwesome&quot;&#125;);</div><div class="line">    &#125;,function()&#123;</div><div class="line">        percent.removeClass(&quot;fa-long-arrow-up&quot;);</div><div class="line">        percent.removeAttr(&quot;style&quot;);</div><div class="line">    &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>匆匆把昨天所做的工作做个了总结，终于搞完了。居然是实验室最后一个走的 orz…</p>
+<hr>
+<p>如有不妥当之处，麻烦指出，谢谢:)</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/LaTeX/">LaTeX</a>
+</div>
+
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="https://deen12520.github.io/2017/03/20/修改回到顶部按钮/" data-title="修改回到顶部按钮 | iDanCy" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/03/20/Java-类/" title="Java 类">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Java 类</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/02/28/hello-world/"  title="Hello World">
+ <strong>下一篇：</strong><br/> 
+ <span>Hello World
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#回到顶部按钮"><span class="toc-number">1.</span> <span class="toc-text">回到顶部按钮</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#环境"><span class="toc-number">1.2.</span> <span class="toc-text">环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#步骤"><span class="toc-number">1.3.</span> <span class="toc-text">步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-修改主题下css对应的totop-styl文"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.修改主题下css对应的totop.styl文</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-修改layout下的totop-ejs"><span class="toc-number">1.3.2.</span> <span class="toc-text">2.修改layout下的totop.ejs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-修改js下的totop-js"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.修改js下的totop.js</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/LaTeX/" title="LaTeX">LaTeX<sup>2</sup></a></li>
+		
+			<li><a href="/categories/foobar/" title="foobar">foobar<sup>1</sup></a></li>
+		
+			<li><a href="/categories/日志/" title="日志">日志<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
+		
+			<li><a href="/tags/foobar/" title="foobar">foobar<sup>1</sup></a></li>
+		
+			<li><a href="/tags/日记/" title="日记">日记<sup>1</sup></a></li>
+		
+			<li><a href="/tags/LaTeX/" title="LaTeX">LaTeX<sup>1</sup></a></li>
+		
+			<li><a href="/tags/WinEdt/" title="WinEdt">WinEdt<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+      <li><a href="http://coolshell.cn/" target="_blank" title="CoolShell">CoolShell</a></li>
+	  <li><a href="http://it.deepinmind.com/index.html" target="_blank" title="DeepinMind">DeepinMind</a><li>
+	  <li><a href="http://mindhacks.cn/" target="_blank" title="MindHacks">MindHacks</a></li> 
+	  <li><a href="https://www.byvoid.com/" target="_blank" title="Beyond the Void">Beyond the Void</a></li> 
+	  <li><a href="http://rednaxelafx.iteye.com/" target="_blank" title="Script Ahead, Code Behind">Script Ahead,Code Behind</a></li> 
+	   <li><a href="http://wmbriggs.com/blog/" target="_blank" title="WILLIAM M. BRIGGS">WILLIAM M. BRIGGS</a></li> 
+	  </ul>
+</div>
+
+  <div class="pay">
+  <p class="asidetitle">赞助我</p>
+	<aside id="text-8" class="widget widget_text">
+	<br/>
+	<div align="center">
+	<div class="textwidget">
+	<form action="https://shenghuo.alipay.com/send/payment/fill.htm" method="POST" target="_blank" accept-charset="GBK"> <input name="optEmail" type="hidden" value="alexyyek@126.com"> 
+	<input name="payAmount" type="hidden" value="10">
+	<input name="title" type="hidden" value="赞助AlexYoung">
+	<input name="memo" type="hidden" value="感谢您的赞助">
+	<input name="pay" type="image" value="捐款" src="/img/alipay1.png">
+	</form>
+	</div>
+</aside>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div align="center">
+<br/>
+	欢迎第
+	<a href="http://www.amazingcounters.com"><img border="0" src="http://cc.amazingcounters.com/counter.php?i=3183127&c=9549694" alt="AmazingCounters.com">
+	</a>
+	位访问者
+</div> 
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> If you love life, life will love you back. <br/>
+			 </p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/Deen12520" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:deen12520@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="https://deen12520.github.io/about" target="_blank" title="Deen12520">Deen12520</a>
+		
+		</p>
+
+		<script type="text/javascript">
+		  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+		  (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+		  e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+		  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+		  
+		  _st('install','XdWzZKnyGyQRz7gyu6Ki','2.0.0');
+		</script>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"ideEn"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'https://deen12520.github.io/js/embed.js';  
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+<!--  百度统计
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F140dd3dc3eb949d6e77762baa6202ce9' type='text/javascript'%3E%3C/script%3E"));
+</script>
+-->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?69edb2848756110a4dbea314888241d5";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script type="text/x-mathjax-config"> 
+MathJax.Hub.Config({ 
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]} 
+}); 
+</script>
+<script type="text/javascript"
+   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<!-- Analytics Begin -->
+
+
+<!-- 百度统计 -->
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%69edb2848756110a4dbea314888241d5' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+<div id="backtoTop" data-action="gototop" title="to_top">
+    <canvas id="backtoTopCanvas" width="48" height="48"></canvas>
+    <div class="percentage"></div>
+    <script src="/js/totop.js"></script>
+</div>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+  </body>
+</html>
