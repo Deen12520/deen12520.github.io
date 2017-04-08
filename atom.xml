@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://deen12520.github.io/"/>
-  <updated>2017-04-02T02:10:16.352Z</updated>
+  <updated>2017-04-08T01:23:10.274Z</updated>
   <id>https://deen12520.github.io/</id>
   
   <author>
@@ -14,6 +14,138 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Line-bot Webhook 创建与部署</title>
+    <link href="https://deen12520.github.io/2017/04/08/Line-bot-Webhook-%E5%88%9B%E5%BB%BA%E4%B8%8E%E9%83%A8%E7%BD%B2/"/>
+    <id>https://deen12520.github.io/2017/04/08/Line-bot-Webhook-创建与部署/</id>
+    <published>2017-04-08T01:22:18.000Z</published>
+    <updated>2017-04-08T01:23:10.274Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Line-bot-Webhook-创建与部署"><a href="#Line-bot-Webhook-创建与部署" class="headerlink" title="Line-bot Webhook 创建与部署"></a><strong>Line-bot Webhook 创建与部署</strong></h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a><strong>前言</strong></h2><p>　　最近在研究LINE bot，通过搭建环境，编写webhook，终于实现bot与line 用户的对话。此过程并不是一帆风顺，期间遇到很多问题，咨询了很多朋友，在此表示感谢，特别感谢line-bot-sdk-python 的维护者。<br>line-bot 实现reply功能的关键在于<code>Webhook</code> 的编写。本文使用了<a href="http://docs.jinkan.org/docs/flask/" target="_blank" rel="external">flask</a>框架来编写Webhook. 在此，就需要解决两个问题：</p>
+<ul>
+<li><strong>1. Webhook 是什么？</strong></li>
+<li><strong>2. Webhook 怎么用？</strong></li>
+</ul>
+<h3 id="1-Webhook-是什么？"><a href="#1-Webhook-是什么？" class="headerlink" title="1. Webhook 是什么？"></a><strong>1. Webhook 是什么？</strong></h3><blockquote>
+<p>官网解释：  Receive notifications in real-time when a user sends a message or friends your account.<br>When an event, such as when a user adds your account or sends a message, is triggered, an HTTPS POST request is sent to the webhook URL that is configured on the Channel Console. </p>
+</blockquote>
+<p>咋一看，似懂非懂。可参考github或者coding中钩子的思想。<br>意思是 当有好友添加你或者发消息给你时，会触发一个事件，然后 就会发送一个HTTPS POST请求到你的 <code>webhook url</code>.(不懂没事，后面还会提到，本文的重点。)</p>
+<h3 id="2-Webhook-有什么作用？"><a href="#2-Webhook-有什么作用？" class="headerlink" title="2. Webhook 有什么作用？"></a><strong>2. Webhook 有什么作用？</strong></h3><p>最简洁的方式，莫过于图。</p>
+<p><img src="http://img.blog.csdn.net/20170407211231027?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Webhook url"></p>
+<p>LINE bot的运作流程是这样的：</p>
+<ol>
+<li>使用者传送消息到LINE bot账号；</li>
+<li>LINE bot收到消息会将消息post给Webhook URL；</li>
+<li>Webhook URL就是我们所说的web service，负责实际处理的消息。</li>
+</ol>
+<p>从问题1和问题2，我们可知，我们需要填写一个<code>webhook url</code>, 且必须是HTTPS协议。而这个 <code>webhook rul</code> 对应的就是我们编写webhook生成的。</p>
+<p>这里，我是将项目部署在 <a href="https://www.heroku.com/python" target="_blank" rel="external">Heroku</a>，免费，且支持HTTPS. 不足的是，因为是国外的一个云服务器，反应略慢。<br>另外，你们也可尝试   <code>ngrok</code>.</p>
+<h2 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a><strong>效果图</strong></h2><p>先看效果，再看值不值得学。<br>本文的目的在于<code>webhook url</code>, 所以这里我做了一个很简单的line-bot，支持简单的自动应答功能。<br>可以体验下，添加我的bot为好友，QR code 如下：<br><img src="http://img.blog.csdn.net/20170407212531173?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="QR code"></p>
+<p>然后，你就可以和我的bot进行对话了。<br><img src="http://img.blog.csdn.net/20170407212641497?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="bot"></p>
+<h2 id="搭建步骤"><a href="#搭建步骤" class="headerlink" title="搭建步骤"></a><strong>搭建步骤</strong></h2><p>本部分是在<a href="https://github.com/twtrubiks/line-bot-tutorial" target="_blank" rel="external">twtrubiks</a>的基础上做些修改和补充，内容是繁体书写，不影响阅读。再次表示感谢作者的付出。</p>
+<hr>
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>本人实践环境及所需工具。</p>
+<ul>
+<li>Windows server 2008 r2</li>
+<li>Heroku</li>
+<li>line-bot-sdk-python</li>
+<li>flask</li>
+<li>git</li>
+<li>python 3.6.1</li>
+</ul>
+<h3 id="步骤如下："><a href="#步骤如下：" class="headerlink" title="步骤如下："></a>步骤如下：</h3><ol>
+<li>请先到 <a href="https://business.line.me/zh-hant/" target="_blank" rel="external">https://business.line.me/zh-hant/</a> 这里登入自己原本的 line 账号，然后选择Messaging API</li>
+</ol>
+<p><img src="http://i.imgur.com/KIzExmQ.jpg" alt="alt tag"></p>
+<p>接下来你会看到 <b>開始使用Messaging API</b> 以及 <b>開始使用Developer Trial</b></p>
+<p>在这里我们选择 <b>開始使用Messaging API</b></p>
+<p><img src="http://i.imgur.com/graLPrj.jpg" alt="alt tag"></p>
+<p>這兩個差別在哪裡呢? 可以到同一個頁面的下方觀看，基本上就只是方案不同而已</p>
+<p><img src="http://i.imgur.com/bERbTGz.jpg" alt="alt tag"></p>
+<p>接著就是一些設定，點選 選擇公司/經營者</p>
+<p><img src="http://i.imgur.com/d1pVdx9.jpg" alt="alt tag"></p>
+<p>點選 新增公司/經營者</p>
+<p><img src="http://i.imgur.com/of23y7W.jpg" alt="alt tag"></p>
+<p>填寫一些資料</p>
+<p><img src="http://i.imgur.com/7L9nulI.jpg" alt="alt tag"></p>
+<p>line bot 的 大頭貼 以及 名稱 設定</p>
+<p><img src="http://i.imgur.com/7483ljT.jpg" alt="alt tag"></p>
+<p><img src="http://i.imgur.com/a4Mf3Rl.jpg" alt="alt tag"></p>
+<p>設定完後，請選擇 申請</p>
+<p><img src="http://i.imgur.com/Q6q8zGA.jpg" alt="alt tag"></p>
+<p>以上設定應該不會有什麼問題</p>
+<p>請選擇 開始使用 API</p>
+<p><img src="http://i.imgur.com/DOEjH0F.jpg" alt="alt tag"></p>
+<p>請選擇 確認</p>
+<p><img src="http://i.imgur.com/pKWBvsj.jpg" alt="alt tag"></p>
+<p>這些請注意，  選擇 <b>允許</b> ，然後記得 <b>儲存</b></p>
+<p><img src="http://i.imgur.com/Ofm9SeJ.jpg" alt="alt tag"></p>
+<p>點選 <b>Line Developers</b></p>
+<p><img src="http://i.imgur.com/cW9713h.jpg" alt="alt tag"></p>
+<p>你會進入下面這個畫面，在這個畫面中，有兩個東西很重要，分別是</p>
+<ul>
+<li><p>Channel Secret</p>
+</li>
+<li><p>Channel Access Token</p>
+</li>
+</ul>
+<p><b>Channel Secret</b></p>
+<p><img src="http://i.imgur.com/jpIEMh4.jpg" alt="alt tag"></p>
+<p><b>Channel Access Token</b></p>
+<p>如果你看到的是空的，請點選 <b>ISSUE</b> 就會顯示了</p>
+<p><img src="http://i.imgur.com/PcCEL4P.jpg" alt="alt tag"></p>
+<p>請將你的 <b>Channel Secret</b> 以及 <b>Channel Access Token </b></p>
+<p>貼到下方的程式碼</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">line_bot_api = LineBotApi(&apos;YOUR_CHANNEL_ACCESS_TOKEN&apos;)</div><div class="line">handler = WebhookHandler(&apos;YOUR_CHANNEL_SECRET&apos;)</div><div class="line">``` </div><div class="line"></div><div class="line">更多内容可參考 [line-bot-sdk-python](https://github.com/line/line-bot-sdk-python)</div><div class="line"></div><div class="line">接下來因為 Line Bot 需要 SSL憑證 ( https )，所以我直接使用 [Heroku](https://dashboard.heroku.com/) </div><div class="line"></div><div class="line">如果不知道什麼是 [Heroku](https://dashboard.heroku.com/)  以及它的使用方法</div><div class="line"></div><div class="line">請參考我之前寫的 [Deploying-Flask-To-Heroku](https://github.com/twtrubiks/Deploying-Flask-To-Heroku)</div><div class="line"></div><div class="line">佈署</div><div class="line"></div><div class="line">![alt tag](http://i.imgur.com/kseRgxr.jpg)</div><div class="line"></div><div class="line">如上圖，我的網址是 [https://python-ine-bot.herokuapp.com/](https://python-ine-bot.herokuapp.com/)</div><div class="line"></div><div class="line">接著我們要加入 Webhook URL ，請點選 EDIT ，並且加入你自己的網址，網址格式</div></pre></td></tr></table></figure>
+<p><a href="https://{你的網址}/callback" target="_blank" rel="external">https://{你的網址}/callback</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">舉例，我的網址就是</div></pre></td></tr></table></figure></p>
+<p><a href="https://python-ine-bot.herokuapp.com/callback" target="_blank" rel="external">https://python-ine-bot.herokuapp.com/callback</a><br>``` </p>
+<p><img src="http://i.imgur.com/5ckn24T.jpg" alt="alt tag"></p>
+<p><img src="http://i.imgur.com/TIjIM9W.jpg" alt="alt tag"></p>
+<p>我的源码已上传至github,请查看<a href="https://github.com/Deen12520/line-bot-flaskr" target="_blank" rel="external">line-bot-flaskr</a>。</p>
+<p>部署成功后，会在Heroku 中看到以下内容：<br><img src="http://img.blog.csdn.net/20170407220433460?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Heroku deploy"></p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h2><h3 id="1-填入-webhook-url-后不需要进行verify"><a href="#1-填入-webhook-url-后不需要进行verify" class="headerlink" title="1.填入 webhook url 后不需要进行verify."></a>1.填入 <code>webhook url</code> 后不需要进行verify.</h3><p>我使用 <a href="https://github.com/line/line-bot-sdk-python" target="_blank" rel="external">line-bot-sdk-python</a>當我按下 VERIFY，出现了如图所示所示错误，不影响bot的使用。原因是点击verify时，会返回一个虚拟的reply_token,所以failed。</p>
+<p><img src="http://i.imgur.com/wb0Qw5W.jpg" alt="alt tag"></p>
+<p><font color="#0099ff"><strong>本人的<code>webhook url</code> :</strong></font><br><img src="http://img.blog.csdn.net/20170407215139719?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>关于这个问题的详细解释，请查看我提交的<a href="#jump">issue</a>.</p>
+<h3 id="2-部署过程中，请创建一个独立的Python运行环境-并保证是在虚拟环境下进行的。"><a href="#2-部署过程中，请创建一个独立的Python运行环境-并保证是在虚拟环境下进行的。" class="headerlink" title="2.部署过程中，请创建一个独立的Python运行环境,并保证是在虚拟环境下进行的。"></a>2.部署过程中，请创建一个独立的Python运行环境,并保证是在虚拟环境下进行的。</h3><p>虚拟环境有个标志(env)，如下图：<br><img src="http://img.blog.csdn.net/20170407221429828?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="env"></p>
+<h3 id="3-多用-Heroku-logs-tail-查看日志，从日志中你就可以找到大多数错误的原因。"><a href="#3-多用-Heroku-logs-tail-查看日志，从日志中你就可以找到大多数错误的原因。" class="headerlink" title="3. 多用 Heroku logs --tail 查看日志，从日志中你就可以找到大多数错误的原因。"></a>3. 多用 <code>Heroku logs --tail</code> 查看日志，从日志中你就可以找到大多数错误的原因。</h3><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>本文的重点是在构造<code>webhook url</code>.<br>主要步骤如下：</p>
+<ol>
+<li>申请一个messaging api 的账号；</li>
+<li>书写callback函数，并部署到Heroku;<br>(代码可直接download我的github源码，执行过程请参照 <a href="https://github.com/twtrubiks/Deploying-Flask-To-Heroku" target="_blank" rel="external">Deploying-Flask-To-Heroku</a> )</li>
+<li>进行bot与好友对话，进行测试。</li>
+</ol>
+<p>部署花了我很长时间，需要对git很熟悉，一步一步的来。</p>
+<p>我的源码已上传至github,请查看<a href="https://github.com/Deen12520/line-bot-flaskr" target="_blank" rel="external">line-bot-flaskr</a>。</p>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a><strong>链接</strong></h2><h3 id="Github-issue"><a href="#Github-issue" class="headerlink" title="Github issue"></a><strong>Github issue</strong></h3><ol>
+<li><span id="jump"><a href="https://github.com/line/line-bot-sdk-python/issues/37" target="_blank" rel="external">webhook url cannot be verified.</a> </span></li>
+</ol>
+<h3 id="参考网址"><a href="#参考网址" class="headerlink" title="参考网址"></a><strong>参考网址</strong></h3><ol>
+<li>两个教学视频：</li>
+</ol>
+<ul>
+<li><p><a href="https://youtu.be/EToFs-ysXKw" target="_blank" rel="external">Youtube Demo Tutorial V1 </a>   </p>
+</li>
+<li><p><a href="https://youtu.be/1IxtWgWxtlE" target="_blank" rel="external">Youtube Demo V2</a>   </p>
+</li>
+</ul>
+<ol>
+<li><a href="https://github.com/line/line-bot-sdk-python" target="_blank" rel="external">line-bot-sdk-python</a></li>
+<li><a href="http://lee-w-blog.logdown.com/posts/1134898-line-echo-bot-on-django" target="_blank" rel="external">Line Echo Bot on Django</a><br>(这篇文章很好，内部写了两种webhook的处理方式。)</li>
+<li><a href="https://devdocs.line.me/en/#messaging-api" target="_blank" rel="external">line messaging-api</a> </li>
+</ol>
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>MIT license</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Line-bot-Webhook-创建与部署&quot;&gt;&lt;a href=&quot;#Line-bot-Webhook-创建与部署&quot; class=&quot;headerlink&quot; title=&quot;Line-bot Webhook 创建与部署&quot;&gt;&lt;/a&gt;&lt;strong&gt;Line-bot Web
+    
+    </summary>
+    
+    
+      <category term="webhook flask" scheme="https://deen12520.github.io/tags/webhook-flask/"/>
+    
+  </entry>
   
   <entry>
     <title>个人知识体系</title>
