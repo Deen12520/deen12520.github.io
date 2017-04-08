@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://deen12520.github.io/"/>
-  <updated>2017-04-08T01:23:10.274Z</updated>
+  <updated>2017-04-08T08:08:25.477Z</updated>
   <id>https://deen12520.github.io/</id>
   
   <author>
@@ -14,6 +14,73 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Hexo-Permission denied(publickey)</title>
+    <link href="https://deen12520.github.io/2017/04/08/Hexo-Permission-denied-publickey/"/>
+    <id>https://deen12520.github.io/2017/04/08/Hexo-Permission-denied-publickey/</id>
+    <published>2017-04-08T06:55:02.000Z</published>
+    <updated>2017-04-08T08:08:25.477Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>hexo deploy 出现错误，如下：</p>
+<p><img src="http://img.blog.csdn.net/20170408114129902?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Permission denied(publickey)"></p>
+<blockquote>
+<p>Error: Permission denied (publickey). </p>
+<p>fatal: Could not read from remote repository. </p>
+<p>Please make sure you have the correct access rights </p>
+<p>and the repository exists.</p>
+</blockquote>
+<h2 id="寻找解决方式"><a href="#寻找解决方式" class="headerlink" title="寻找解决方式"></a>寻找解决方式</h2><h3 id="1-核查我的公钥"><a href="#1-核查我的公钥" class="headerlink" title="1. 核查我的公钥"></a>1. 核查我的公钥</h3><p>我确认我的公钥是没问题的，而且之前也可也成功 push 到 github 上。 </p>
+<p>此外我通过 ssh -vT git@github.com 进行测试没问题。 </p>
+<p>显示的是： </p>
+<blockquote>
+<p>Hi jrhu05! You’ve successfully authenticated, but GitHub does not<br>provide shell access. </p>
+<p>debug1: channel 0: free: client-session, nchannels 1 </p>
+<p>Transferred: sent 3244, received 1776 bytes, in 0.6 seconds </p>
+<p>Bytes per second: sent 5263.9, received 2881.8 </p>
+<p>debug1: Exit status 1</p>
+</blockquote>
+<h3 id="2-核查git地址（支持SSH）"><a href="#2-核查git地址（支持SSH）" class="headerlink" title="2. 核查git地址（支持SSH）"></a>2. 核查git地址（支持SSH）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">deploy: </div><div class="line">  type: git</div><div class="line">  repo: git@github.com:Deen/deen120.github.io.git</div><div class="line">  branch: master</div></pre></td></tr></table></figure>
+<p>进行完上面两步后，都没问题，然而问题并没有解决。</p>
+<h3 id="真正的解决方式"><a href="#真正的解决方式" class="headerlink" title="真正的解决方式"></a>真正的解决方式</h3><p>然后，这样居然成功了。</p>
+<p><img src="http://img.blog.csdn.net/20170408114420373?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="git bash"></p>
+<p>在git bash 中运行成功。</p>
+<p>什么鬼,orz。</p>
+<font color="red">cmd 和git bash 会出现不同结果，未查到原因，求大神解答。</font>
+
+<hr>
+<p>附：linux 下相同问题的一个解决方法。<br><a href="https://www.v2ex.com/t/280562" target="_blank" rel="external">https://www.v2ex.com/t/280562</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;hexo deploy 出现错误，如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://img.blog.csdn.net/2017040
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>[置顶] 博客文章汇总目录</title>
+    <link href="https://deen12520.github.io/2017/04/08/%E7%BD%AE%E9%A1%B6-%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E6%B1%87%E6%80%BB%E7%9B%AE%E5%BD%95/"/>
+    <id>https://deen12520.github.io/2017/04/08/置顶-博客文章汇总目录/</id>
+    <published>2017-04-08T06:51:45.000Z</published>
+    <updated>2017-04-08T08:08:51.073Z</updated>
+    
+    <content type="html"><![CDATA[<p>为了方便大家更好的梳理本博客的资源，更快的检索自己需要的博文，现将文章涉及的知识来源作如下归类，以后发表新的教程也会在本置顶帖内同步更新，后期考虑将加入更多的博客以外的资源链接，欢迎关注AlexYoung’s blog，与我一同成长。</p>
+<h1 id="Python-系列"><a href="#Python-系列" class="headerlink" title="Python 系列"></a>Python 系列</h1><h1 id="算法系列"><a href="#算法系列" class="headerlink" title="算法系列"></a>算法系列</h1><h1 id="数据挖掘系列"><a href="#数据挖掘系列" class="headerlink" title="数据挖掘系列"></a>数据挖掘系列</h1><h1 id="工具系列"><a href="#工具系列" class="headerlink" title="工具系列"></a>工具系列</h1>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;为了方便大家更好的梳理本博客的资源，更快的检索自己需要的博文，现将文章涉及的知识来源作如下归类，以后发表新的教程也会在本置顶帖内同步更新，后期考虑将加入更多的博客以外的资源链接，欢迎关注AlexYoung’s blog，与我一同成长。&lt;/p&gt;
+&lt;h1 id=&quot;Python-
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Line-bot Webhook 创建与部署</title>
