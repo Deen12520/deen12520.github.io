@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://deen12520.github.io/"/>
-  <updated>2017-04-08T08:08:25.477Z</updated>
+  <updated>2017-04-22T02:37:31.730Z</updated>
   <id>https://deen12520.github.io/</id>
   
   <author>
@@ -14,6 +14,50 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Flask and PostgreSQL on Heroku</title>
+    <link href="https://deen12520.github.io/2017/04/22/Flask-and-PostgreSQL-on-Heroku/"/>
+    <id>https://deen12520.github.io/2017/04/22/Flask-and-PostgreSQL-on-Heroku/</id>
+    <published>2017-04-22T02:37:12.000Z</published>
+    <updated>2017-04-22T02:37:31.730Z</updated>
+    
+    <content type="html"><![CDATA[<p>原文链接：<a href="http://blog.y3xz.com/blog/2012/08/16/flask-and-postgresql-on-heroku/" target="_blank" rel="external">Flask and PostgreSQL on Heroku</a></p>
+<p><code>Heroku</code>  越来越成为我最喜欢的部署简单Python应用程序的平台。<code>Heroku</code> 实际上为你提供了一个完整管理的系统，你只需几分钟就可以部署你的应用。更不用说它的免费版(1 dyno, Postgres dev plan)， 实际上给予我们的更多，让我们可以做更多事。</p>
+<p>你可以按照<code>Heroku</code>上的官网文档，它给出了<a href="https://devcenter.heroku.com/articles/python/" target="_blank" rel="external">如何从头开始</a>，但是我发现它对如何设置<code>Postgres</code> 缺乏一些说明，所以我给出了一个快速部署简单的Python 应用的完整教程。</p>
+<p>这篇文章所用的所有代码可在<a href="https://github.com/yuvadm/heroku-python-skeleton" target="_blank" rel="external">matching repository on Github.</a>找到。</p>
+<p>在这里，我会假设你有基本项目基础，如果没有，请参考前面提到的教程。然后我们需要为PostgreSQL 添加支持。我们使用<a href="http://packages.python.org/Flask-SQLAlchemy/" target="_blank" rel="external"> Flask-SQLAlchemy</a>来做这个，它提供了连接到 Postgres DB 的所有东西，而且可以方便地使用ORM。 所以首先我们需要安装这个依赖，然后把它加到我们的 <code>requirements.txt</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span> $ pip install flask-sqlalchemy psycopg2</div><div class="line"><span class="number">2</span> <span class="comment"># don't forget to update requirements.txt</span></div><div class="line"><span class="number">3</span> $ pip freeze &gt; requirements.txt</div></pre></td></tr></table></figure>
+<p>在继续之前，我们需要先创建一个 Postgres DB，然后我们将从免费开发计划开始，它允许最多10K行和20个并发连接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">1 $ heroku addons:add heroku-postgresql:dev</div><div class="line">2 -----&gt; Adding heroku-postgresql:dev to some-app-name...done, v196 (free)</div><div class="line">3 Attached as HEROKU_POSTGRESQL_COLOR</div><div class="line">4 Database has been created and is available</div></pre></td></tr></table></figure>
+<p>一旦建立数据库，我们就应该推广它，然后 <code>DATABASE_URL</code> 环境变量将被创建：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ heroku pg:promote HEROKU_POSTGRESQL_COLOR</div><div class="line">Promoting HEROKU_POSTGRESQL_COLOR_URL to DATABASE_URL... done</div></pre></td></tr></table></figure>
+<p>现在我们可以继续前进，导入库并添加基本连接样板：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> flask.ext.sqlalchemy <span class="keyword">import</span> SQLAlchemy</div><div class="line"></div><div class="line">app = Flask(__name__)</div><div class="line">app.config[<span class="string">'SQLALCHEMY_DATABASE_URI'</span>] = os.environ[<span class="string">'DATABASE_URL'</span>]</div><div class="line">db = SQLAlchemy(app)</div></pre></td></tr></table></figure>
+<p>对于此步骤，您可以选择使用Kenneth Reitz的 flask-heroku    库，它可以自动处理所有连接URLs，不仅适用于Postgres，还可用于其他服务，如redis，sentry, exceptional 和其他服务。</p>
+<p>下一步是提交模板代码并创建DB 表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ git commit -a -m &quot;added DB boilerplate&quot;</div><div class="line">$ git push heroku master</div><div class="line"># ...</div><div class="line">$ heroku run python</div></pre></td></tr></table></figure>
+<p>一旦我们连接上Python终端，我们就可以执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; from app import db</div><div class="line">&gt;&gt;&gt; db.create_all()</div></pre></td></tr></table></figure>
+<p>我们就设置好了！ 从这里，我们可以开始使用SQLAlchemy代码同定义模型和创建，查询和删除目标。 下面是一些例子。我们可以通过创建一个新 <code>User</code> 模型开始:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span><span class="params">(db.Model)</span>:</span></div><div class="line">    id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)</div><div class="line">    name = db.Column(db.String(<span class="number">80</span>))</div><div class="line">    email = db.Column(db.String(<span class="number">120</span>), unique=<span class="keyword">True</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name, email)</span>:</span></div><div class="line">        self.name = name</div><div class="line">        self.email = email</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="string">'&lt;Name %r&gt;'</span> % self.name</div></pre></td></tr></table></figure>
+<p>我们可以创建对象本身:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">user = User(&apos;John Doe&apos;, &apos;john.doe@example.com&apos;)</div><div class="line">db.session.add(user)</div><div class="line">db.session.commit()</div></pre></td></tr></table></figure>
+<p>我们可以查询目标：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">all_users = User.query.all()</div></pre></td></tr></table></figure>
+<p>我们也可以删除目标：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">user = User(&apos;John Doe&apos;, &apos;john.doe@example.com&apos;)</div><div class="line">db.session.delete(user)</div><div class="line">db.session.commit()</div></pre></td></tr></table></figure>
+<p>这就是你需要知道的关于在Heroku上设置Flask + Postgres应用程序。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;原文链接：&lt;a href=&quot;http://blog.y3xz.com/blog/2012/08/16/flask-and-postgresql-on-heroku/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Flask and PostgreSQL o
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Hexo-Permission denied(publickey)</title>
