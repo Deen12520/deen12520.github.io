@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title><![CDATA[Flask and PostgreSQL on Heroku]]></title>
+      <url>/2017/04/22/Flask-and-PostgreSQL-on-Heroku/</url>
+      <content type="html"><![CDATA[<p>原文链接：<a href="http://blog.y3xz.com/blog/2012/08/16/flask-and-postgresql-on-heroku/" target="_blank" rel="external">Flask and PostgreSQL on Heroku</a></p>
+<p><code>Heroku</code>  越来越成为我最喜欢的部署简单Python应用程序的平台。<code>Heroku</code> 实际上为你提供了一个完整管理的系统，你只需几分钟就可以部署你的应用。更不用说它的免费版(1 dyno, Postgres dev plan)， 实际上给予我们的更多，让我们可以做更多事。</p>
+<p>你可以按照<code>Heroku</code>上的官网文档，它给出了<a href="https://devcenter.heroku.com/articles/python/" target="_blank" rel="external">如何从头开始</a>，但是我发现它对如何设置<code>Postgres</code> 缺乏一些说明，所以我给出了一个快速部署简单的Python 应用的完整教程。</p>
+<p>这篇文章所用的所有代码可在<a href="https://github.com/yuvadm/heroku-python-skeleton" target="_blank" rel="external">matching repository on Github.</a>找到。</p>
+<p>在这里，我会假设你有基本项目基础，如果没有，请参考前面提到的教程。然后我们需要为PostgreSQL 添加支持。我们使用<a href="http://packages.python.org/Flask-SQLAlchemy/" target="_blank" rel="external"> Flask-SQLAlchemy</a>来做这个，它提供了连接到 Postgres DB 的所有东西，而且可以方便地使用ORM。 所以首先我们需要安装这个依赖，然后把它加到我们的 <code>requirements.txt</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span> $ pip install flask-sqlalchemy psycopg2</div><div class="line"><span class="number">2</span> <span class="comment"># don't forget to update requirements.txt</span></div><div class="line"><span class="number">3</span> $ pip freeze &gt; requirements.txt</div></pre></td></tr></table></figure>
+<p>在继续之前，我们需要先创建一个 Postgres DB，然后我们将从免费开发计划开始，它允许最多10K行和20个并发连接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">1 $ heroku addons:add heroku-postgresql:dev</div><div class="line">2 -----&gt; Adding heroku-postgresql:dev to some-app-name...done, v196 (free)</div><div class="line">3 Attached as HEROKU_POSTGRESQL_COLOR</div><div class="line">4 Database has been created and is available</div></pre></td></tr></table></figure>
+<p>一旦建立数据库，我们就应该推广它，然后 <code>DATABASE_URL</code> 环境变量将被创建：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ heroku pg:promote HEROKU_POSTGRESQL_COLOR</div><div class="line">Promoting HEROKU_POSTGRESQL_COLOR_URL to DATABASE_URL... done</div></pre></td></tr></table></figure>
+<p>现在我们可以继续前进，导入库并添加基本连接样板：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> flask.ext.sqlalchemy <span class="keyword">import</span> SQLAlchemy</div><div class="line"></div><div class="line">app = Flask(__name__)</div><div class="line">app.config[<span class="string">'SQLALCHEMY_DATABASE_URI'</span>] = os.environ[<span class="string">'DATABASE_URL'</span>]</div><div class="line">db = SQLAlchemy(app)</div></pre></td></tr></table></figure>
+<p>对于此步骤，您可以选择使用Kenneth Reitz的 flask-heroku    库，它可以自动处理所有连接URLs，不仅适用于Postgres，还可用于其他服务，如redis，sentry, exceptional 和其他服务。</p>
+<p>下一步是提交模板代码并创建DB 表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ git commit -a -m &quot;added DB boilerplate&quot;</div><div class="line">$ git push heroku master</div><div class="line"># ...</div><div class="line">$ heroku run python</div></pre></td></tr></table></figure>
+<p>一旦我们连接上Python终端，我们就可以执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; from app import db</div><div class="line">&gt;&gt;&gt; db.create_all()</div></pre></td></tr></table></figure>
+<p>我们就设置好了！ 从这里，我们可以开始使用SQLAlchemy代码同定义模型和创建，查询和删除目标。 下面是一些例子。我们可以通过创建一个新 <code>User</code> 模型开始:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span><span class="params">(db.Model)</span>:</span></div><div class="line">    id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)</div><div class="line">    name = db.Column(db.String(<span class="number">80</span>))</div><div class="line">    email = db.Column(db.String(<span class="number">120</span>), unique=<span class="keyword">True</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name, email)</span>:</span></div><div class="line">        self.name = name</div><div class="line">        self.email = email</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="string">'&lt;Name %r&gt;'</span> % self.name</div></pre></td></tr></table></figure>
+<p>我们可以创建对象本身:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">user = User(&apos;John Doe&apos;, &apos;john.doe@example.com&apos;)</div><div class="line">db.session.add(user)</div><div class="line">db.session.commit()</div></pre></td></tr></table></figure>
+<p>我们可以查询目标：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">all_users = User.query.all()</div></pre></td></tr></table></figure>
+<p>我们也可以删除目标：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">user = User(&apos;John Doe&apos;, &apos;john.doe@example.com&apos;)</div><div class="line">db.session.delete(user)</div><div class="line">db.session.commit()</div></pre></td></tr></table></figure>
+<p>这就是你需要知道的关于在Heroku上设置Flask + Postgres应用程序。</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Hexo-Permission denied(publickey)]]></title>
+      <url>/2017/04/08/Hexo-Permission-denied-publickey/</url>
+      <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>hexo deploy 出现错误，如下：</p>
+<p><img src="http://img.blog.csdn.net/20170408114129902?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Permission denied(publickey)"></p>
+<blockquote>
+<p>Error: Permission denied (publickey). </p>
+<p>fatal: Could not read from remote repository. </p>
+<p>Please make sure you have the correct access rights </p>
+<p>and the repository exists.</p>
+</blockquote>
+<h2 id="寻找解决方式"><a href="#寻找解决方式" class="headerlink" title="寻找解决方式"></a>寻找解决方式</h2><h3 id="1-核查我的公钥"><a href="#1-核查我的公钥" class="headerlink" title="1. 核查我的公钥"></a>1. 核查我的公钥</h3><p>我确认我的公钥是没问题的，而且之前也可也成功 push 到 github 上。 </p>
+<p>此外我通过 ssh -vT git@github.com 进行测试没问题。 </p>
+<p>显示的是： </p>
+<blockquote>
+<p>Hi jrhu05! You’ve successfully authenticated, but GitHub does not<br>provide shell access. </p>
+<p>debug1: channel 0: free: client-session, nchannels 1 </p>
+<p>Transferred: sent 3244, received 1776 bytes, in 0.6 seconds </p>
+<p>Bytes per second: sent 5263.9, received 2881.8 </p>
+<p>debug1: Exit status 1</p>
+</blockquote>
+<h3 id="2-核查git地址（支持SSH）"><a href="#2-核查git地址（支持SSH）" class="headerlink" title="2. 核查git地址（支持SSH）"></a>2. 核查git地址（支持SSH）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">deploy: </div><div class="line">  type: git</div><div class="line">  repo: git@github.com:Deen/deen120.github.io.git</div><div class="line">  branch: master</div></pre></td></tr></table></figure>
+<p>进行完上面两步后，都没问题，然而问题并没有解决。</p>
+<h3 id="真正的解决方式"><a href="#真正的解决方式" class="headerlink" title="真正的解决方式"></a>真正的解决方式</h3><p>然后，这样居然成功了。</p>
+<p><img src="http://img.blog.csdn.net/20170408114420373?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="git bash"></p>
+<p>在git bash 中运行成功。</p>
+<p>什么鬼,orz。</p>
+<font color="red">cmd 和git bash 会出现不同结果，未查到原因，求大神解答。</font>
+
+<hr>
+<p>附：linux 下相同问题的一个解决方法。<br><a href="https://www.v2ex.com/t/280562" target="_blank" rel="external">https://www.v2ex.com/t/280562</a></p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[[置顶] 博客文章汇总目录]]></title>
+      <url>/2017/04/08/%E7%BD%AE%E9%A1%B6-%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E6%B1%87%E6%80%BB%E7%9B%AE%E5%BD%95/</url>
+      <content type="html"><![CDATA[<p>为了方便大家更好的梳理本博客的资源，更快的检索自己需要的博文，现将文章涉及的知识来源作如下归类，以后发表新的教程也会在本置顶帖内同步更新，后期考虑将加入更多的博客以外的资源链接，欢迎关注iDancy’s blog，与我一同成长。</p>
+<h1 id="Python-系列"><a href="#Python-系列" class="headerlink" title="Python 系列"></a>Python 系列</h1><h1 id="算法系列"><a href="#算法系列" class="headerlink" title="算法系列"></a>算法系列</h1><h1 id="数据挖掘系列"><a href="#数据挖掘系列" class="headerlink" title="数据挖掘系列"></a>数据挖掘系列</h1><h1 id="工具系列"><a href="#工具系列" class="headerlink" title="工具系列"></a>工具系列</h1>]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Line-bot Webhook 创建与部署]]></title>
+      <url>/2017/04/08/Line-bot-Webhook-%E5%88%9B%E5%BB%BA%E4%B8%8E%E9%83%A8%E7%BD%B2/</url>
+      <content type="html"><![CDATA[<h1 id="Line-bot-Webhook-创建与部署"><a href="#Line-bot-Webhook-创建与部署" class="headerlink" title="Line-bot Webhook 创建与部署"></a><strong>Line-bot Webhook 创建与部署</strong></h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a><strong>前言</strong></h2><p>　　最近在研究LINE bot，通过搭建环境，编写webhook，终于实现bot与line 用户的对话。此过程并不是一帆风顺，期间遇到很多问题，咨询了很多朋友，在此表示感谢，特别感谢line-bot-sdk-python 的维护者。<br>line-bot 实现reply功能的关键在于<code>Webhook</code> 的编写。本文使用了<a href="http://docs.jinkan.org/docs/flask/" target="_blank" rel="external">flask</a>框架来编写Webhook. 在此，就需要解决两个问题：</p>
+<ul>
+<li><strong>1. Webhook 是什么？</strong></li>
+<li><strong>2. Webhook 怎么用？</strong></li>
+</ul>
+<h3 id="1-Webhook-是什么？"><a href="#1-Webhook-是什么？" class="headerlink" title="1. Webhook 是什么？"></a><strong>1. Webhook 是什么？</strong></h3><blockquote>
+<p>官网解释：  Receive notifications in real-time when a user sends a message or friends your account.<br>When an event, such as when a user adds your account or sends a message, is triggered, an HTTPS POST request is sent to the webhook URL that is configured on the Channel Console. </p>
+</blockquote>
+<p>咋一看，似懂非懂。可参考github或者coding中钩子的思想。<br>意思是 当有好友添加你或者发消息给你时，会触发一个事件，然后 就会发送一个HTTPS POST请求到你的 <code>webhook url</code>.(不懂没事，后面还会提到，本文的重点。)</p>
+<h3 id="2-Webhook-有什么作用？"><a href="#2-Webhook-有什么作用？" class="headerlink" title="2. Webhook 有什么作用？"></a><strong>2. Webhook 有什么作用？</strong></h3><p>最简洁的方式，莫过于图。</p>
+<p><img src="http://img.blog.csdn.net/20170407211231027?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Webhook url"></p>
+<p>LINE bot的运作流程是这样的：</p>
+<ol>
+<li>使用者传送消息到LINE bot账号；</li>
+<li>LINE bot收到消息会将消息post给Webhook URL；</li>
+<li>Webhook URL就是我们所说的web service，负责实际处理的消息。</li>
+</ol>
+<p>从问题1和问题2，我们可知，我们需要填写一个<code>webhook url</code>, 且必须是HTTPS协议。而这个 <code>webhook rul</code> 对应的就是我们编写webhook生成的。</p>
+<p>这里，我是将项目部署在 <a href="https://www.heroku.com/python" target="_blank" rel="external">Heroku</a>，免费，且支持HTTPS. 不足的是，因为是国外的一个云服务器，反应略慢。<br>另外，你们也可尝试   <code>ngrok</code>.</p>
+<h2 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a><strong>效果图</strong></h2><p>先看效果，再看值不值得学。<br>本文的目的在于<code>webhook url</code>, 所以这里我做了一个很简单的line-bot，支持简单的自动应答功能。<br>可以体验下，添加我的bot为好友，QR code 如下：<br><img src="http://img.blog.csdn.net/20170407212531173?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="QR code"></p>
+<p>然后，你就可以和我的bot进行对话了。<br><img src="http://img.blog.csdn.net/20170407212641497?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="bot"></p>
+<h2 id="搭建步骤"><a href="#搭建步骤" class="headerlink" title="搭建步骤"></a><strong>搭建步骤</strong></h2><p>本部分是在<a href="https://github.com/twtrubiks/line-bot-tutorial" target="_blank" rel="external">twtrubiks</a>的基础上做些修改和补充，内容是繁体书写，不影响阅读。再次表示感谢作者的付出。</p>
+<hr>
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>本人实践环境及所需工具。</p>
+<ul>
+<li>Windows server 2008 r2</li>
+<li>Heroku</li>
+<li>line-bot-sdk-python</li>
+<li>flask</li>
+<li>git</li>
+<li>python 3.6.1</li>
+</ul>
+<h3 id="步骤如下："><a href="#步骤如下：" class="headerlink" title="步骤如下："></a>步骤如下：</h3><ol>
+<li>请先到 <a href="https://business.line.me/zh-hant/" target="_blank" rel="external">https://business.line.me/zh-hant/</a> 这里登入自己原本的 line 账号，然后选择Messaging API</li>
+</ol>
+<p><img src="http://i.imgur.com/KIzExmQ.jpg" alt="alt tag"></p>
+<p>接下来你会看到 <b>開始使用Messaging API</b> 以及 <b>開始使用Developer Trial</b></p>
+<p>在这里我们选择 <b>開始使用Messaging API</b></p>
+<p><img src="http://i.imgur.com/graLPrj.jpg" alt="alt tag"></p>
+<p>這兩個差別在哪裡呢? 可以到同一個頁面的下方觀看，基本上就只是方案不同而已</p>
+<p><img src="http://i.imgur.com/bERbTGz.jpg" alt="alt tag"></p>
+<p>接著就是一些設定，點選 選擇公司/經營者</p>
+<p><img src="http://i.imgur.com/d1pVdx9.jpg" alt="alt tag"></p>
+<p>點選 新增公司/經營者</p>
+<p><img src="http://i.imgur.com/of23y7W.jpg" alt="alt tag"></p>
+<p>填寫一些資料</p>
+<p><img src="http://i.imgur.com/7L9nulI.jpg" alt="alt tag"></p>
+<p>line bot 的 大頭貼 以及 名稱 設定</p>
+<p><img src="http://i.imgur.com/7483ljT.jpg" alt="alt tag"></p>
+<p><img src="http://i.imgur.com/a4Mf3Rl.jpg" alt="alt tag"></p>
+<p>設定完後，請選擇 申請</p>
+<p><img src="http://i.imgur.com/Q6q8zGA.jpg" alt="alt tag"></p>
+<p>以上設定應該不會有什麼問題</p>
+<p>請選擇 開始使用 API</p>
+<p><img src="http://i.imgur.com/DOEjH0F.jpg" alt="alt tag"></p>
+<p>請選擇 確認</p>
+<p><img src="http://i.imgur.com/pKWBvsj.jpg" alt="alt tag"></p>
+<p>這些請注意，  選擇 <b>允許</b> ，然後記得 <b>儲存</b></p>
+<p><img src="http://i.imgur.com/Ofm9SeJ.jpg" alt="alt tag"></p>
+<p>點選 <b>Line Developers</b></p>
+<p><img src="http://i.imgur.com/cW9713h.jpg" alt="alt tag"></p>
+<p>你會進入下面這個畫面，在這個畫面中，有兩個東西很重要，分別是</p>
+<ul>
+<li><p>Channel Secret</p>
+</li>
+<li><p>Channel Access Token</p>
+</li>
+</ul>
+<p><b>Channel Secret</b></p>
+<p><img src="http://i.imgur.com/jpIEMh4.jpg" alt="alt tag"></p>
+<p><b>Channel Access Token</b></p>
+<p>如果你看到的是空的，請點選 <b>ISSUE</b> 就會顯示了</p>
+<p><img src="http://i.imgur.com/PcCEL4P.jpg" alt="alt tag"></p>
+<p>請將你的 <b>Channel Secret</b> 以及 <b>Channel Access Token </b></p>
+<p>貼到下方的程式碼</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">line_bot_api = LineBotApi(&apos;YOUR_CHANNEL_ACCESS_TOKEN&apos;)</div><div class="line">handler = WebhookHandler(&apos;YOUR_CHANNEL_SECRET&apos;)</div><div class="line">``` </div><div class="line"></div><div class="line">更多内容可參考 [line-bot-sdk-python](https://github.com/line/line-bot-sdk-python)</div><div class="line"></div><div class="line">接下來因為 Line Bot 需要 SSL憑證 ( https )，所以我直接使用 [Heroku](https://dashboard.heroku.com/) </div><div class="line"></div><div class="line">如果不知道什麼是 [Heroku](https://dashboard.heroku.com/)  以及它的使用方法</div><div class="line"></div><div class="line">請參考我之前寫的 [Deploying-Flask-To-Heroku](https://github.com/twtrubiks/Deploying-Flask-To-Heroku)</div><div class="line"></div><div class="line">佈署</div><div class="line"></div><div class="line">![alt tag](http://i.imgur.com/kseRgxr.jpg)</div><div class="line"></div><div class="line">如上圖，我的網址是 [https://python-ine-bot.herokuapp.com/](https://python-ine-bot.herokuapp.com/)</div><div class="line"></div><div class="line">接著我們要加入 Webhook URL ，請點選 EDIT ，並且加入你自己的網址，網址格式</div></pre></td></tr></table></figure>
+<p><a href="https://{你的網址}/callback" target="_blank" rel="external">https://{你的網址}/callback</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">舉例，我的網址就是</div></pre></td></tr></table></figure></p>
+<p><a href="https://python-ine-bot.herokuapp.com/callback" target="_blank" rel="external">https://python-ine-bot.herokuapp.com/callback</a><br>``` </p>
+<p><img src="http://i.imgur.com/5ckn24T.jpg" alt="alt tag"></p>
+<p><img src="http://i.imgur.com/TIjIM9W.jpg" alt="alt tag"></p>
+<p>我的源码已上传至github,请查看<a href="https://github.com/Deen12520/line-bot-flaskr" target="_blank" rel="external">line-bot-flaskr</a>。</p>
+<p>部署成功后，会在Heroku 中看到以下内容：<br><img src="http://img.blog.csdn.net/20170407220433460?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Heroku deploy"></p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h2><h3 id="1-填入-webhook-url-后不需要进行verify"><a href="#1-填入-webhook-url-后不需要进行verify" class="headerlink" title="1.填入 webhook url 后不需要进行verify."></a>1.填入 <code>webhook url</code> 后不需要进行verify.</h3><p>我使用 <a href="https://github.com/line/line-bot-sdk-python" target="_blank" rel="external">line-bot-sdk-python</a>當我按下 VERIFY，出现了如图所示所示错误，不影响bot的使用。原因是点击verify时，会返回一个虚拟的reply_token,所以failed。</p>
+<p><img src="http://i.imgur.com/wb0Qw5W.jpg" alt="alt tag"></p>
+<p><font color="#0099ff"><strong>本人的<code>webhook url</code> :</strong></font><br><img src="http://img.blog.csdn.net/20170407215139719?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>关于这个问题的详细解释，请查看我提交的<a href="#jump">issue</a>.</p>
+<h3 id="2-部署过程中，请创建一个独立的Python运行环境-并保证是在虚拟环境下进行的。"><a href="#2-部署过程中，请创建一个独立的Python运行环境-并保证是在虚拟环境下进行的。" class="headerlink" title="2.部署过程中，请创建一个独立的Python运行环境,并保证是在虚拟环境下进行的。"></a>2.部署过程中，请创建一个独立的Python运行环境,并保证是在虚拟环境下进行的。</h3><p>虚拟环境有个标志(env)，如下图：<br><img src="http://img.blog.csdn.net/20170407221429828?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="env"></p>
+<h3 id="3-多用-Heroku-logs-tail-查看日志，从日志中你就可以找到大多数错误的原因。"><a href="#3-多用-Heroku-logs-tail-查看日志，从日志中你就可以找到大多数错误的原因。" class="headerlink" title="3. 多用 Heroku logs --tail 查看日志，从日志中你就可以找到大多数错误的原因。"></a>3. 多用 <code>Heroku logs --tail</code> 查看日志，从日志中你就可以找到大多数错误的原因。</h3><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>本文的重点是在构造<code>webhook url</code>.<br>主要步骤如下：</p>
+<ol>
+<li>申请一个messaging api 的账号；</li>
+<li>书写callback函数，并部署到Heroku;<br>(代码可直接download我的github源码，执行过程请参照 <a href="https://github.com/twtrubiks/Deploying-Flask-To-Heroku" target="_blank" rel="external">Deploying-Flask-To-Heroku</a> )</li>
+<li>进行bot与好友对话，进行测试。</li>
+</ol>
+<p>部署花了我很长时间，需要对git很熟悉，一步一步的来。</p>
+<p>我的源码已上传至github,请查看<a href="https://github.com/Deen12520/line-bot-flaskr" target="_blank" rel="external">line-bot-flaskr</a>。</p>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a><strong>链接</strong></h2><h3 id="Github-issue"><a href="#Github-issue" class="headerlink" title="Github issue"></a><strong>Github issue</strong></h3><ol>
+<li><span id="jump"><a href="https://github.com/line/line-bot-sdk-python/issues/37" target="_blank" rel="external">webhook url cannot be verified.</a> </span></li>
+</ol>
+<h3 id="参考网址"><a href="#参考网址" class="headerlink" title="参考网址"></a><strong>参考网址</strong></h3><ol>
+<li>两个教学视频：</li>
+</ol>
+<ul>
+<li><p><a href="https://youtu.be/EToFs-ysXKw" target="_blank" rel="external">Youtube Demo Tutorial V1 </a>   </p>
+</li>
+<li><p><a href="https://youtu.be/1IxtWgWxtlE" target="_blank" rel="external">Youtube Demo V2</a>   </p>
+</li>
+</ul>
+<ol>
+<li><a href="https://github.com/line/line-bot-sdk-python" target="_blank" rel="external">line-bot-sdk-python</a></li>
+<li><a href="http://lee-w-blog.logdown.com/posts/1134898-line-echo-bot-on-django" target="_blank" rel="external">Line Echo Bot on Django</a><br>(这篇文章很好，内部写了两种webhook的处理方式。)</li>
+<li><a href="https://devdocs.line.me/en/#messaging-api" target="_blank" rel="external">line messaging-api</a> </li>
+</ol>
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>MIT license</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> webhook flask </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[个人知识体系]]></title>
+      <url>/2017/04/02/%E4%B8%AA%E4%BA%BA%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB/</url>
+      <content type="html"><![CDATA[<h1 id="个人知识体系"><a href="#个人知识体系" class="headerlink" title="个人知识体系"></a>个人知识体系</h1><p>CSDN博客</p>
+<h2 id="基础课程"><a href="#基础课程" class="headerlink" title="基础课程"></a>基础课程</h2><h3 id="软件开发"><a href="#软件开发" class="headerlink" title="软件开发"></a>软件开发</h3><h4 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h4><h5 id="只有消失的需求，没有消失的技术"><a href="#只有消失的需求，没有消失的技术" class="headerlink" title="只有消失的需求，没有消失的技术"></a>只有消失的需求，没有消失的技术</h5><h4 id="IT项目管理"><a href="#IT项目管理" class="headerlink" title="IT项目管理"></a>IT项目管理</h4><h5 id="进度、需求变更、范围、成功、时间等"><a href="#进度、需求变更、范围、成功、时间等" class="headerlink" title="进度、需求变更、范围、成功、时间等"></a>进度、需求变更、范围、成功、时间等</h5><h4 id="软件测试技术"><a href="#软件测试技术" class="headerlink" title="软件测试技术"></a>软件测试技术</h4><h5 id="功能测试、压力测试等"><a href="#功能测试、压力测试等" class="headerlink" title="功能测试、压力测试等"></a>功能测试、压力测试等</h5><h5 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h5><h6 id="黑盒-白盒-Junit"><a href="#黑盒-白盒-Junit" class="headerlink" title="黑盒/白盒/Junit"></a>黑盒/白盒/Junit</h6><h4 id="UML"><a href="#UML" class="headerlink" title="UML"></a>UML</h4><h5 id="活动图"><a href="#活动图" class="headerlink" title="活动图"></a>活动图</h5><h5 id="状态图"><a href="#状态图" class="headerlink" title="状态图"></a>状态图</h5><h5 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h5><h4 id="软件设计模式"><a href="#软件设计模式" class="headerlink" title="软件设计模式"></a>软件设计模式</h4><h5 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h5><h4 id="J2EE-应用与开发"><a href="#J2EE-应用与开发" class="headerlink" title="J2EE 应用与开发"></a>J2EE 应用与开发</h4><h5 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h5><h5 id="JSP"><a href="#JSP" class="headerlink" title="JSP"></a>JSP</h5><h5 id="JAVA-Bean"><a href="#JAVA-Bean" class="headerlink" title="JAVA Bean"></a>JAVA Bean</h5><h4 id="数据库技术"><a href="#数据库技术" class="headerlink" title="数据库技术"></a>数据库技术</h4><h5 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h5><h4 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h4><h5 id="PHP"><a href="#PHP" class="headerlink" title="PHP"></a>PHP</h5><h6 id="CGI"><a href="#CGI" class="headerlink" title="CGI"></a>CGI</h6><h4 id="并行计算"><a href="#并行计算" class="headerlink" title="并行计算"></a>并行计算</h4><h5 id="谱聚类的可扩展性分析"><a href="#谱聚类的可扩展性分析" class="headerlink" title="谱聚类的可扩展性分析"></a>谱聚类的可扩展性分析</h5><h4 id="算法设计与分析"><a href="#算法设计与分析" class="headerlink" title="算法设计与分析"></a>算法设计与分析</h4><h5 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h5><h6 id="01背包"><a href="#01背包" class="headerlink" title="01背包"></a>01背包</h6><h6 id="最长子序列"><a href="#最长子序列" class="headerlink" title="最长子序列"></a>最长子序列</h6><h5 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h5><h6 id="深度优先"><a href="#深度优先" class="headerlink" title="深度优先"></a>深度优先</h6><h6 id="广度优先"><a href="#广度优先" class="headerlink" title="广度优先"></a>广度优先</h6><h4 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h4><h4 id="云计算"><a href="#云计算" class="headerlink" title="云计算"></a>云计算</h4><h5 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h5><h5 id="OpenStack"><a href="#OpenStack" class="headerlink" title="OpenStack"></a>OpenStack</h5><h4 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h4><h5 id="TCP-IP"><a href="#TCP-IP" class="headerlink" title="TCP/IP"></a>TCP/IP</h5><h5 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h5><h6 id="不可靠的传输"><a href="#不可靠的传输" class="headerlink" title="不可靠的传输"></a>不可靠的传输</h6><h5 id="Socket-套接字"><a href="#Socket-套接字" class="headerlink" title="Socket/套接字"></a>Socket/套接字</h5><h4 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h4><h5 id="基本操作命令"><a href="#基本操作命令" class="headerlink" title="基本操作命令"></a>基本操作命令</h5><h5 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h5><h4 id="C程序设计与开发"><a href="#C程序设计与开发" class="headerlink" title="C程序设计与开发"></a>C程序设计与开发</h4><h5 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h5><h5 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h5><h5 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h5><h4 id="计算机图形学"><a href="#计算机图形学" class="headerlink" title="计算机图形学"></a>计算机图形学</h4><h5 id="C-MFC"><a href="#C-MFC" class="headerlink" title="C++/MFC"></a>C++/MFC</h5><h3 id="数据分析"><a href="#数据分析" class="headerlink" title="数据分析"></a>数据分析</h3><h4 id="数值分析"><a href="#数值分析" class="headerlink" title="数值分析"></a>数值分析</h4><h5 id="Jacob"><a href="#Jacob" class="headerlink" title="Jacob"></a>Jacob</h5><h4 id="数学建模"><a href="#数学建模" class="headerlink" title="数学建模"></a>数学建模</h4><h5 id="matlab"><a href="#matlab" class="headerlink" title="matlab"></a>matlab</h5><h5 id="层次分析法"><a href="#层次分析法" class="headerlink" title="层次分析法"></a>层次分析法</h5><h5 id="时间序列"><a href="#时间序列" class="headerlink" title="时间序列"></a>时间序列</h5><h5 id="模拟仿真"><a href="#模拟仿真" class="headerlink" title="模拟仿真"></a>模拟仿真</h5><h4 id="运筹学"><a href="#运筹学" class="headerlink" title="运筹学"></a>运筹学</h4><h5 id="调度问题"><a href="#调度问题" class="headerlink" title="调度问题"></a>调度问题</h5><h4 id="数据分析-1"><a href="#数据分析-1" class="headerlink" title="数据分析"></a>数据分析</h4><h5 id="SPSS"><a href="#SPSS" class="headerlink" title="SPSS"></a>SPSS</h5><h4 id="数据挖掘"><a href="#数据挖掘" class="headerlink" title="数据挖掘"></a>数据挖掘</h4><h5 id="聚类"><a href="#聚类" class="headerlink" title="聚类"></a>聚类</h5><h5 id="关联规则"><a href="#关联规则" class="headerlink" title="关联规则"></a>关联规则</h5><h5 id="粗糙集"><a href="#粗糙集" class="headerlink" title="粗糙集"></a>粗糙集</h5><h4 id="概率论与数理统计"><a href="#概率论与数理统计" class="headerlink" title="概率论与数理统计"></a>概率论与数理统计</h4><h2 id="项目学习"><a href="#项目学习" class="headerlink" title="项目学习"></a>项目学习</h2><h3 id="POS-收银系统"><a href="#POS-收银系统" class="headerlink" title="POS 收银系统"></a>POS 收银系统</h3><h4 id="技术"><a href="#技术" class="headerlink" title="技术"></a>技术</h4><h5 id="基于组件开发"><a href="#基于组件开发" class="headerlink" title="基于组件开发"></a>基于组件开发</h5><h5 id="Delphi-postgresql"><a href="#Delphi-postgresql" class="headerlink" title="Delphi + postgresql"></a>Delphi + postgresql</h5><h4 id="难点及解决方式"><a href="#难点及解决方式" class="headerlink" title="难点及解决方式"></a>难点及解决方式</h4><p>所有项目难点精简到一条，只谈最难。</p>
+<h5 id="促销"><a href="#促销" class="headerlink" title="促销"></a>促销</h5><h5 id="结算"><a href="#结算" class="headerlink" title="结算"></a>结算</h5><h5 id="退货"><a href="#退货" class="headerlink" title="退货"></a>退货</h5><h3 id="图书管理系统"><a href="#图书管理系统" class="headerlink" title="图书管理系统"></a>图书管理系统</h3><h4 id="Java-struct-2"><a href="#Java-struct-2" class="headerlink" title="Java + struct 2"></a>Java + struct 2</h4><h3 id="谱聚类的可扩展性分析-1"><a href="#谱聚类的可扩展性分析-1" class="headerlink" title="谱聚类的可扩展性分析"></a>谱聚类的可扩展性分析</h3><h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><h4 id="难点及解决"><a href="#难点及解决" class="headerlink" title="难点及解决"></a>难点及解决</h4><h2 id="实习经历"><a href="#实习经历" class="headerlink" title="实习经历"></a>实习经历</h2><h3 id="亿阳信通-2014年7月-9月"><a href="#亿阳信通-2014年7月-9月" class="headerlink" title="亿阳信通 2014年7月-9月"></a>亿阳信通 2014年7月-9月</h3><h3 id="运维"><a href="#运维" class="headerlink" title="运维"></a>运维</h3><h4 id="系统部署（移动管线布置和政府合同管理）"><a href="#系统部署（移动管线布置和政府合同管理）" class="headerlink" title="系统部署（移动管线布置和政府合同管理）"></a>系统部署（移动管线布置和政府合同管理）</h4><h4 id="Bug提交（工单错误）"><a href="#Bug提交（工单错误）" class="headerlink" title="Bug提交（工单错误）"></a>Bug提交（工单错误）</h4><h2 id="业余拓展"><a href="#业余拓展" class="headerlink" title="业余拓展"></a>业余拓展</h2><h3 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h3><h4 id="Flask-源码"><a href="#Flask-源码" class="headerlink" title="Flask 源码"></a>Flask 源码</h4><h5 id="网站"><a href="#网站" class="headerlink" title="网站"></a>网站</h5><h4 id="爬虫"><a href="#爬虫" class="headerlink" title="爬虫"></a>爬虫</h4><h3 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h3><h3 id="Html-CSS-JS"><a href="#Html-CSS-JS" class="headerlink" title="Html/CSS/JS"></a>Html/CSS/JS</h3><h4 id="计算机网页设计比赛"><a href="#计算机网页设计比赛" class="headerlink" title="计算机网页设计比赛"></a>计算机网页设计比赛</h4><h3 id="Ubuntu"><a href="#Ubuntu" class="headerlink" title="Ubuntu"></a>Ubuntu</h3><h3 id="Hexo-github"><a href="#Hexo-github" class="headerlink" title="Hexo + github"></a>Hexo + github</h3><h4 id="个人博客"><a href="#个人博客" class="headerlink" title="个人博客"></a>个人博客</h4><h4 id="基于node-js"><a href="#基于node-js" class="headerlink" title="基于node.js"></a>基于node.js</h4><h3 id="postgresql"><a href="#postgresql" class="headerlink" title="postgresql"></a>postgresql</h3><h3 id="oracle"><a href="#oracle" class="headerlink" title="oracle"></a>oracle</h3><h3 id="Git-版本控制工具"><a href="#Git-版本控制工具" class="headerlink" title="Git 版本控制工具"></a>Git 版本控制工具</h3><h3 id="Shell-脚本命令"><a href="#Shell-脚本命令" class="headerlink" title="Shell 脚本命令"></a>Shell 脚本命令</h3>]]></content>
+      
+        
+        <tags>
+            
+            <tag> 成长 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Java 类]]></title>
+      <url>/2017/03/20/Java-%E7%B1%BB/</url>
+      <content type="html"><![CDATA[<p>测试代码高亮</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">WaterSource</span></span>&#123;</div><div class="line">    <span class="keyword">private</span> String s;</div><div class="line">    WaterSource()&#123;</div><div class="line">        System.out.println(<span class="string">"WaterSource()"</span>);</div><div class="line">        s = <span class="string">"constructed"</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">return</span> s;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SprinklerSystem</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> String name = <span class="string">"Alex"</span>;<span class="comment">//Initializing at point of definition</span></div><div class="line">    <span class="keyword">private</span> String sex;</div><div class="line">    <span class="keyword">private</span> WaterSource wSource;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">double</span> d;</div><div class="line">    <span class="function"><span class="keyword">public</span>  <span class="title">SprinklerSystem</span><span class="params">()</span></span>&#123;</div><div class="line">        System.out.println(<span class="string">"In Sprinkler"</span>);</div><div class="line">        d = <span class="number">1.0</span>;    <span class="comment">//Initailizing in the constructor of class</span></div><div class="line">        wSource = <span class="keyword">new</span> WaterSource();</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span> (sex == <span class="keyword">null</span>) &#123; sex = <span class="string">"male"</span>; &#125;<span class="comment">//Delayed initialization</span></div><div class="line">        <span class="keyword">return</span> </div><div class="line">            <span class="string">"string"</span> + <span class="string">"="</span> + name + <span class="string">" "</span> +</div><div class="line">            <span class="string">"sex"</span> + <span class="string">"="</span> + sex + <span class="string">" "</span> +</div><div class="line">            <span class="string">"double"</span> + <span class="string">"="</span> + d + <span class="string">" "</span> +</div><div class="line">            <span class="string">"WaterSource"</span> + <span class="string">"="</span> + wSource;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</div><div class="line">        SprinklerSystem sprinklers = <span class="keyword">new</span> SprinklerSystem();</div><div class="line">        System.out.println(sprinklers);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+      
+        
+        <tags>
+            
+            <tag> Java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[修改回到顶部按钮]]></title>
+      <url>/2017/03/20/%E4%BF%AE%E6%94%B9%E5%9B%9E%E5%88%B0%E9%A1%B6%E9%83%A8%E6%8C%89%E9%92%AE/</url>
+      <content type="html"><![CDATA[<h2 id="回到顶部按钮"><a href="#回到顶部按钮" class="headerlink" title="回到顶部按钮"></a><strong>回到顶部按钮</strong></h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a><strong>前言</strong></h3><p>最近学习使用Hexo搭建了一个<a href="https://deen12520.github.io">博客</a>，theme 使用的是<a href="https://github.com/Deen12520/geekman" target="_blank" rel="external">geekman</a>(在jakman基础修改的一个版本)。</p>
+<p>在博客中加入了回到顶部，偶然一次看到<a href="https://unnamed42.github.io/2016-09-10-Hexo%E6%8A%98%E8%85%BE%E7%AC%94%E8%AE%B0.html" target="_blank" rel="external">Hexo 折腾笔记</a>中的回到顶部的百分比样式的按钮效果，很炫酷，所以自己动手照着教程造了轮子，具体效果可进本人博客查看 <a href="https://deen12520.github.io/">iDanCy</a>。</p>
+<p>这里我主要针对自己的主题做出修改，可能不适用其他主题。这个按钮是一个圆形按钮，有一个实时更新的圆形进度条显示你当前阅读进度，但反应相对有些慢（逃。</p>
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a><strong>环境</strong></h3><p>window7 32bit,   hexo 3,  geekman</p>
+<p>使用本方法，请核对环境是否和我的一致。本方法只在geekman主题测试。</p>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a><strong>步骤</strong></h3><h4 id="1-修改主题下css对应的totop-styl文"><a href="#1-修改主题下css对应的totop-styl文" class="headerlink" title="1.修改主题下css对应的totop.styl文"></a>1.修改主题下css对应的totop.styl文</h4><p>如下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">#backtoTop &#123;</div><div class="line">    background-color: #eee;</div><div class="line">    border-radius: 100%;</div><div class="line">    bottom: 5%;</div><div class="line">    height: 48px;</div><div class="line">    width: 48px;</div><div class="line">    position: fixed;</div><div class="line">    right: -100px;</div><div class="line">    z-index: 99;</div><div class="line">    -webkit-transition: 0.5s;</div><div class="line">       -moz-transition: 0.5s;</div><div class="line">            transition: 0.5s;</div><div class="line">    &amp;.display &#123;right: 10px;&#125;</div><div class="line">&#125;</div><div class="line">.percentage &#123;</div><div class="line">    font-size: 16px;</div><div class="line">    height: 48px;</div><div class="line">    line-height: 48px;</div><div class="line">    position: absolute;</div><div class="line">    text-align: center;</div><div class="line">    top: 0;</div><div class="line">    width: 48px;</div><div class="line">    color: #555;</div><div class="line">    cursor: pointer;</div><div class="line">    &amp;:before &#123;content:attr(data-percent);&#125;</div><div class="line">    &amp;:hover:before &#123;content:"↑";font-size:20px&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="2-修改layout下的totop-ejs"><a href="#2-修改layout下的totop-ejs" class="headerlink" title="2.修改layout下的totop.ejs"></a>2.修改layout下的totop.ejs</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;% if (theme.totop)&#123; %&gt;</div><div class="line">&lt;div id=&quot;backtoTop&quot; data-action=&quot;gototop&quot; title=&quot;&lt;%- __(&apos;to_top&apos;) %&gt;&quot;&gt;</div><div class="line">    &lt;canvas id=&quot;backtoTopCanvas&quot; width=&quot;48&quot; height=&quot;48&quot;&gt;&lt;/canvas&gt;</div><div class="line">    &lt;div class=&quot;percentage&quot;&gt;&lt;/div&gt;</div><div class="line">    &lt;script src=&quot;&lt;%- config.root %&gt;js/totop.js&quot;&gt;&lt;/script&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;% &#125; %&gt;</div></pre></td></tr></table></figure>
+<h4 id="3-修改js下的totop-js"><a href="#3-修改js下的totop-js" class="headerlink" title="3.修改js下的totop.js"></a>3.修改js下的totop.js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line">var bigfa_scroll = &#123;</div><div class="line">    drawCircle: function(id, percentage, color) &#123;</div><div class="line">        var width = $(id).width();</div><div class="line">        var height = $(id).height();</div><div class="line">        var radius = parseInt(width / 2.20);</div><div class="line">        var position = width;</div><div class="line">        var positionBy2 = position / 2;</div><div class="line">        var bg = $(id)[0];</div><div class="line">        id = id.split(&quot;#&quot;);</div><div class="line">        var ctx = bg.getContext(&quot;2d&quot;);</div><div class="line">        var imd = null;</div><div class="line">        var circ = Math.PI * 2;</div><div class="line">        var quart = Math.PI / 2;</div><div class="line">        ctx.clearRect(0, 0, width, height);</div><div class="line">        ctx.beginPath();</div><div class="line">        ctx.strokeStyle = color;</div><div class="line">        ctx.lineCap = &quot;square&quot;;</div><div class="line">        ctx.closePath();</div><div class="line">        ctx.fill();</div><div class="line">        ctx.lineWidth = 3;</div><div class="line">        imd = ctx.getImageData(0, 0, position, position);</div><div class="line">        var draw = function(current, ctxPass) &#123;</div><div class="line">            ctxPass.putImageData(imd, 0, 0);</div><div class="line">            ctxPass.beginPath();</div><div class="line">            ctxPass.arc(positionBy2, positionBy2, radius, -(quart), ((circ) * current) - quart, false);</div><div class="line">            ctxPass.stroke();</div><div class="line">        &#125;</div><div class="line">        draw(percentage / 100, ctx);</div><div class="line">    &#125;,</div><div class="line">    backToTop: function($this) &#123;</div><div class="line">        $this.click(function() &#123;</div><div class="line">            $(&quot;body,html&quot;).animate(&#123;</div><div class="line">                scrollTop: 0</div><div class="line">            &#125;,</div><div class="line">            800);</div><div class="line">            return false;</div><div class="line">        &#125;);</div><div class="line">    &#125;,</div><div class="line">    scrollHook: function($this, color) &#123;</div><div class="line">        color = color ? color: &quot;#000000&quot;;</div><div class="line">        $this.scroll(function() &#123;</div><div class="line">            var docHeight = ($(document).height() - $(window).height()),</div><div class="line">            $windowObj = $this,</div><div class="line">            $per = $(&quot;.percentage&quot;),</div><div class="line">            percentage = 0;</div><div class="line">            defaultScroll = $windowObj.scrollTop();</div><div class="line">            percentage = parseInt((defaultScroll / docHeight) * 100);</div><div class="line">            var backToTop = $(&quot;#backtoTop&quot;);</div><div class="line">            if (backToTop.length &gt; 0) &#123;</div><div class="line">                if ($windowObj.scrollTop() &gt; 200) &#123;</div><div class="line">                    backToTop.addClass(&quot;display&quot;);</div><div class="line">                &#125; else &#123;</div><div class="line">                    backToTop.removeClass(&quot;display&quot;);</div><div class="line">                &#125;</div><div class="line">                $per.attr(&quot;data-percent&quot;, percentage);</div><div class="line">                bigfa_scroll.drawCircle(&quot;#backtoTopCanvas&quot;, percentage, color);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">$(document).ready(function() &#123;</div><div class="line">    var T = bigfa_scroll,</div><div class="line">        totop = $(&quot;#backtoTop&quot;),</div><div class="line">        percent = totop.children(&quot;.percentage&quot;);</div><div class="line">    T.backToTop(totop);</div><div class="line">    T.scrollHook($(window), &quot;#99ccff&quot;);</div><div class="line">    percent.hover(function()&#123;</div><div class="line">        percent.addClass(&quot;fa-long-arrow-up&quot;);</div><div class="line">        percent.css(&#123;&quot;font-family&quot;:&quot;FontAwesome&quot;&#125;);</div><div class="line">    &#125;,function()&#123;</div><div class="line">        percent.removeClass(&quot;fa-long-arrow-up&quot;);</div><div class="line">        percent.removeAttr(&quot;style&quot;);</div><div class="line">    &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>匆匆把昨天所做的工作做个了总结，终于搞完了。居然是实验室最后一个走的 orz…</p>
+<hr>
+<p>如有不妥当之处，麻烦指出，谢谢:)</p>
+]]></content>
+      
+        <categories>
+            
+            <category> LaTeX </category>
+            
+        </categories>
+        
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Hello World]]></title>
+      <url>/2017/02/28/hello-world/</url>
+      <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[foobar更换皮肤]]></title>
+      <url>/2016/07/07/abc/</url>
+      <content type="html"><![CDATA[<h2 id="foobar更换皮肤"><a href="#foobar更换皮肤" class="headerlink" title="foobar更换皮肤"></a><strong>foobar更换皮肤</strong></h2><h3 id="foobar-2000-介绍"><a href="#foobar-2000-介绍" class="headerlink" title="foobar 2000 介绍"></a><strong>foobar 2000 介绍</strong></h3><p>Foobar2000是一款免费的的音频播放器软件，除了播放之外，它还支持生成媒体库、转换媒体文件编码、提取CD等功能。它是一款功能强大的工具。</p>
+<ul>
+<li>开放的组件结构，第三方开发者得以扩充播放器的功能 </li>
+<li>Windows NT/2000/XP平台下的完全Unicode支持</li>
+<li>低内存占用，可高效率处理庞大的播放列表 </li>
+<li>具备高级文件消息处理能力（通用文件信息框和批量标记器）</li>
+<li>可自定义键盘快捷键（包括全局热键功能） </li>
+<li>标签页式（Tabbed）播放清单显示 </li>
+<li>可多播放列表并存 </li>
+<li>音乐数据库</li>
+<li>支持流式播放 </li>
+<li>支持扩展插件 </li>
+<li>免费软件</li>
+</ul>
+<p>简介 引用wiki.</p>
+<h3 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a><strong>下载安装</strong></h3><p>官网下载网址：<br><a href="http://www.foobar2000.org/download" target="_blank" rel="external">http://www.foobar2000.org/download</a></p>
+<p>foobar 安装很简单，按照提示一步一步地走下去就ok.</p>
+<h3 id="更换皮肤"><a href="#更换皮肤" class="headerlink" title="更换皮肤"></a><strong>更换皮肤</strong></h3><p>foobar 主要有两种用户界面模块，一种是“默认用户界面”，另一种是“分栏用户界面” 。下面只介绍功能更加强大的分栏用户界面的各种设置方法。</p>
+<p><strong>step 1:</strong> 要使用分栏用户界面需先添加 foo_ui_columns 插件，重启 foobar 后打开参数选项窗口。左侧点击“显示”，在右侧将“用户界面模块”选为“分栏用户界面”。</p>
+<p><img src="http://img.blog.csdn.net/20170309104334082?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="参数选项"></p>
+<p>注：插件的添加：先下载好需要的插件，放到components中。</p>
+<p><strong>step 2:</strong> 在目录下添加 fcl文件<br>基于分栏用户界面制作的皮肤设置信息储存在后缀为 fcl 的文件中，含有界面按钮图片、脚本等资料的皮肤配置文件夹通常存储在 foobar 根目录下的 skins 文件夹中（有些存储在根目录下的 images 文件夹中）。<br>将你下载好的皮肤skins文件下的fcl文件即对应的文件夹（存图片、按钮、js等）复制到foobar 目录下的skins 文件夹中。</p>
+<p><strong>step 3:</strong> 导入 fcl文件<br>打开参数选项窗口，左侧点击“显示-分栏用户界面”，右侧点击“主窗口”标签，再点击“FCL 导入和导出”中的“导入”按钮， 选择上面提到的 fcl 文件， 就可以导入 皮肤。</p>
+<p><img src="http://img.blog.csdn.net/20170309105207632?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="分栏用户界面"></p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a><strong>小结</strong></h3><p>一款皮肤=配置文件 fcl + 含有按钮图片、脚本等的皮肤配置文件夹+ 必要的插件</p>
+<p>foobar 2000 可根据自己的喜好作出优美的界面，值得一试，学习中….</p>
+<hr>
+<p>有兴趣的可前往</p>
+<ol>
+<li><a href="http://tieba.baidu.com/f?kw=foobar2000&amp;ie=utf-8" target="_blank" rel="external">foobar 2000吧</a></li>
+<li><a href="http://blog.sina.com.cn/go2spa" target="_blank" rel="external">http://blog.sina.com.cn/go2spa</a></li>
+</ol>
+<hr>
+<p>有不妥当之处，麻烦指出 :)</p>
+]]></content>
+      
+        <categories>
+            
+            <category> foobar </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> foobar </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[上手LaTeX基本文档结构]]></title>
+      <url>/2016/05/07/abc/</url>
+      <content type="html"><![CDATA[<h2 id="上手LaTeX基本文档结构"><a href="#上手LaTeX基本文档结构" class="headerlink" title="上手LaTeX基本文档结构"></a><strong>上手LaTeX基本文档结构</strong></h2><h3 id="绪论"><a href="#绪论" class="headerlink" title="绪论"></a><strong>绪论</strong></h3><p>最佳学习软件的方式是上手。<br>下面提供一个LaTeX基本文档结构。</p>
+<h3 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境"></a><strong>实验环境</strong></h3><p>操作系统：windows 7 32 bit<br>编辑器：WinEdt 7.0</p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a><strong>实验</strong></h3><ol>
+<li>语法说明</li>
+</ol>
+<blockquote>
+<p>所有的环境，都是起于 $$\begin{环境名称}，止于<br>\end{环境名称}$$这两个指令之间的文稿都会被作用，而且，环境之内还可以套用其他不同的环境。  LaTeX 文稿的内文，其实就是包在一个<br>\begin{document} 和 \end{document} 这个 document 环境当中。</p>
+</blockquote>
+<ol>
+<li>例子</li>
+</ol>
+<p>这个例子以article为例。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">\documentclass&#123;article&#125; % 定义文件类型，有book，article等</div><div class="line"></div><div class="line">\begin&#123;document&#125;   %开始正文部分</div><div class="line"></div><div class="line">This is my first type setting example.</div><div class="line"></div><div class="line">\end&#123;document&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>运行效果</strong><br><img src="http://img.blog.csdn.net/20170225113105229?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="运行结果"></p>
+<h3 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a><strong>进阶</strong></h3><p>增加章节和公式。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">%编辑于20170225 by deen</div><div class="line"></div><div class="line">\documentclass[12pt]&#123;article&#125;     % 定义文件类型（后续文章详细说明），有book，article等 ,文章字体大小为12pt</div><div class="line"></div><div class="line">\usepackage&#123;CJK&#125;            % 引用中文包 </div><div class="line">\usepackage&#123;amsmath&#125;        % 引用数学类宏包</div><div class="line">\begin&#123;CJK&#125;&#123;GBK&#125;&#123;song&#125;      % 开始中文环境，使用宋体</div><div class="line">\begin&#123;document&#125;            % 开始正文部分</div><div class="line">  \section&#123;LaTeX 上手&#125;</div><div class="line">    Hello \LaTeX&#123;&#125;!</div><div class="line">    \subsection&#123;语法&#125;</div><div class="line">      Hello \LaTeX! $f(x) = x^2$</div><div class="line">      % 此处空格代表换行</div><div class="line">    质能方程表述如下：</div><div class="line">      $$ E = mc^2 $$   </div><div class="line">    \subsection&#123;实践&#125;</div><div class="line">      Hello deen!</div><div class="line"> \end&#123;CJK&#125;                    %结束中文</div><div class="line">\end&#123;document&#125;               %结束正文部分</div></pre></td></tr></table></figure>
+<p>效果如下：<br><img src="http://img.blog.csdn.net/20170225115804016?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="基本文档结构"></p>
+<hr>
+<p><strong>附 LaTex的学习网址</strong></p>
+<ol>
+<li><a href="https://zh.wikibooks.org/zh-cn/LaTeX" target="_blank" rel="external">LaTeX入门手册</a></li>
+<li><a href="http://bbs.ctex.org/forum.php" target="_blank" rel="external">CTeX 中文论坛</a></li>
+</ol>
+<p>如有不妥当之处，请指出，谢谢！</p>
+]]></content>
+      
+        <categories>
+            
+            <category> LaTeX </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> LaTeX </tag>
+            
+            <tag> WinEdt </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[新的开始]]></title>
+      <url>/2014/05/07/abc/</url>
+      <content type="html"><![CDATA[<p>这是<strong>新的开始</strong>，我用hexo创建了第一篇文章。</p>
+<p>通过下面的命令，就可以创建新文章<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D:\workspace\javascript\nodejs-hexo&gt;hexo new 新的开始</div><div class="line">[info] File created at D:\workspace\javascript\nodejs-hexo\source\_posts\新的开始.md</div></pre></td></tr></table></figure></p>
+<p>感觉非常好。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 日志 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 日记 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+  
+  
+</search>
