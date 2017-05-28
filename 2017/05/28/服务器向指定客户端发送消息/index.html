@@ -1,0 +1,516 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta name="baidu-site-verification" content="GliC1jSe3E" />
+  
+    <title>服务器向指定客户端发送消息 | iDanCy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Deen12520">
+    
+    <meta name="description" content="一.需求需求如题. 当多个客户端连接服务器时,服务器如何给指定的客户端发送消息.
+二.解决方案核心思想: 在服务器端,需保存不同客户端的socket列表及客户端相关信息.socket含有发送方和接收方的ip和端口号,所以通过socket就能向指定的客户端发送消息.
+经查阅资料,得到如下解决方案:
+
+">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="iDanCy" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="iDanCy" title="iDanCy"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="iDanCy">iDanCy</a></h1>
+				<h2 class="blog-motto">Nothing is more.</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:deen12520.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/05/28/服务器向指定客户端发送消息/" title="服务器向指定客户端发送消息" itemprop="url">服务器向指定客户端发送消息</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://deen12520.github.io/about" title="Deen12520" target="_blank" itemprop="author">Deen12520</a>
+		
+  <p class="article-time">
+    <time datetime="2017-05-28T04:41:49.000Z" itemprop="datePublished"> 發表於 2017-05-28</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一-需求"><span class="toc-number">1.</span> <span class="toc-text">一.需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二-解决方案"><span class="toc-number">2.</span> <span class="toc-text">二.解决方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-实践"><span class="toc-number">3.</span> <span class="toc-text">三.实践</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四-总结"><span class="toc-number">4.</span> <span class="toc-text">四.总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考文献"><span class="toc-number">5.</span> <span class="toc-text">参考文献</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="一-需求"><a href="#一-需求" class="headerlink" title="一.需求"></a><strong>一.需求</strong></h2><p>需求如题. 当多个客户端连接服务器时,服务器如何给指定的客户端发送消息.</p>
+<h2 id="二-解决方案"><a href="#二-解决方案" class="headerlink" title="二.解决方案"></a><strong>二.解决方案</strong></h2><p>核心思想: 在服务器端,需保存不同客户端的socket列表及客户端相关信息.<br>socket含有发送方和接收方的ip和端口号,所以通过socket就能向指定的客户端发送消息.</p>
+<p>经查阅资料,得到如下解决方案:</p>
+<ol>
+<li>用户连接时,立即向服务器发送自己的唯一ID,服务器端将ID和对应的socket用map存储. 向客户端发送消息时,就可以通过ID,找到对应的socket,然后向其发送消息.</li>
+<li>如果客户端ip固定,服务器每收到一个Socket都用Map<ip,socket>存起来.</ip,socket></li>
+</ol>
+<h2 id="三-实践"><a href="#三-实践" class="headerlink" title="三.实践"></a><strong>三.实践</strong></h2><p>说明:采用第一种解决方案,模拟服务器向指定的客户端发送消息.</p>
+<p>服务端循环监听,第一个服务器进来,向其发送其自身序号,第二个进来,遍历socke列表,向列表中的每一个客户端发送其对应的序号,从而达到服务器向指定客户端发送消息的功能.<br><strong>服务器端</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> server;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.*;</div><div class="line"><span class="keyword">import</span> java.net.*;</div><div class="line"><span class="keyword">import</span> java.util.HashMap;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 主函数,实现服务器向指定客户端发送消息的功能.</div><div class="line"> * 客户端用python书写</div><div class="line"> * <span class="doctag">@author</span> dingding</div><div class="line"> *</div><div class="line"> */</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Run</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> PORT = <span class="number">30000</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> HashMap&lt;String, Socket&gt; socketList = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String channelToken;  <span class="comment">//socket 令牌</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> BufferedReader bufferedReader;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            ServerSocket server =  <span class="keyword">new</span> ServerSocket(PORT);</div><div class="line">            System.out.println(<span class="string">"server is listenning..."</span>);</div><div class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;<span class="comment">//不断循环随时等待新的客户端接入服务器</span></div><div class="line">                Socket clientSocket = server.accept();</div><div class="line">                bufferedReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(clientSocket.getInputStream()));</div><div class="line">                channelToken = bufferedReader.readLine();</div><div class="line">                socketList.put(channelToken,clientSocket);   <span class="comment">//保存会话ID和socket</span></div><div class="line">                <span class="comment">//System.out.println(socketList.get(channelToken));</span></div><div class="line">                <span class="comment">//System.out.println(socketList);</span></div><div class="line">                <span class="keyword">new</span> ServerThread(clientSocket,socketList);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> server;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.*;</div><div class="line"><span class="keyword">import</span> java.net.*;</div><div class="line"><span class="keyword">import</span> java.util.*;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerThread</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</div><div class="line">    <span class="keyword">private</span> Socket client;</div><div class="line">    <span class="keyword">private</span> PrintWriter out;</div><div class="line">    <span class="keyword">private</span>  HashMap&lt;String, Socket&gt; clientList = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ServerThread</span><span class="params">(Socket socket,HashMap&lt;String, Socket&gt; socketList)</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">        <span class="keyword">super</span>();</div><div class="line">        client = socket;</div><div class="line">        clientList = socketList;</div><div class="line">        </div><div class="line">        start();</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</div><div class="line">        Socket socket;</div><div class="line">        System.out.println(<span class="string">"Client: "</span>+getName()+<span class="string">" come in..."</span>);</div><div class="line">        </div><div class="line">        <span class="comment">//每当客户端连接上,就向相应的客户端进行回应</span></div><div class="line">        Iterator&lt;HashMap.Entry&lt;String, Socket&gt;&gt; entries = clientList.entrySet().iterator(); </div><div class="line">        <span class="keyword">while</span> (entries.hasNext())&#123;</div><div class="line">            HashMap.Entry&lt;String, Socket&gt; entry = entries.next(); </div><div class="line">            System.out.println(entry.getKey());</div><div class="line">            <span class="keyword">if</span> (!String.valueOf(entry.getKey()).equals(<span class="string">""</span>)) &#123;</div><div class="line">                System.out.println(entry.getValue());</div><div class="line">                System.out.println(<span class="string">"-------------"</span>);</div><div class="line">                socket = entry.getValue();</div><div class="line">                <span class="keyword">if</span> (socket!=<span class="keyword">null</span>) &#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        out = <span class="keyword">new</span> PrintWriter(socket.getOutputStream());  <span class="comment">//回复client的ID</span></div><div class="line">                        out.println(entry.getKey());</div><div class="line">                        out.flush();</div><div class="line">                    &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>两个客户端</strong><br>用两个python客户端来模拟场景.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#coding = utf-8</span></div><div class="line"><span class="keyword">import</span> socket</div><div class="line"><span class="keyword">import</span> threading</div><div class="line"></div><div class="line">HOST = <span class="string">"localhost"</span></div><div class="line">PORT = <span class="number">30000</span></div><div class="line"></div><div class="line">sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</div><div class="line">sock.connect((HOST, PORT))  </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></div><div class="line">    socketID = <span class="string">'I am 111'</span>    </div><div class="line">    sock.sendall((socketID+<span class="string">'\r'</span>).encode())</div><div class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">        data = sock.recv(<span class="number">1024</span>).decode()</div><div class="line">        print(<span class="string">'from line: '</span>+data)</div><div class="line">    sock.close()</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    test()</div></pre></td></tr></table></figure></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#coding = utf-8</span></div><div class="line"><span class="keyword">import</span> socket</div><div class="line"><span class="keyword">import</span> threading</div><div class="line"></div><div class="line">HOST = <span class="string">"localhost"</span></div><div class="line">PORT = <span class="number">30000</span></div><div class="line"></div><div class="line">sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</div><div class="line">sock.connect((HOST, PORT))</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></div><div class="line">    socketID = <span class="string">'I am 000'</span>    </div><div class="line">    sock.sendall((socketID+<span class="string">'\r'</span>).encode())</div><div class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">        data = sock.recv(<span class="number">1024</span>).decode()</div><div class="line">        print(<span class="string">'from line: '</span>+data)</div><div class="line">    sock.close()</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    test()</div></pre></td></tr></table></figure>
+<h2 id="四-总结"><a href="#四-总结" class="headerlink" title="四.总结"></a><strong>四.总结</strong></h2><p>socket 服务器向指定的客户端发消息,网上给的资源不多,大多是关于服务器群发. 这里给出了具体解决方案,并通过实例证实了该方案的可行性.</p>
+<p>有时看的资料越多,越不明白.这并总是好事.<br>这个时候就需要静下来理理思路,然后针对具体的解决方案,编程实现.<br>实践才是检验真理的唯一标准,设计代码的时候你就离成功又近了一步.</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a><strong>参考文献</strong></h2><ol>
+<li><a href="http://bbs.csdn.net/topics/390840898?page=1" target="_blank" rel="external">java socket编程中，如何让服务器主动向指定ip地址的客户端发送信息</a></li>
+<li><a href="http://bbs.csdn.net/topics/340255239" target="_blank" rel="external">socket 服务器给指定的客户端发消息该怎么处理</a></li>
+<li><a href="https://q.cnblogs.com/q/36105/" target="_blank" rel="external">socket 服务器给指定的客户端发消息该怎么处理</a></li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="https://deen12520.github.io/2017/05/28/服务器向指定客户端发送消息/" data-title="服务器向指定客户端发送消息 | iDanCy" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2017/05/28/由简入繁阐述单例模式/"  title="由简入繁阐述单例模式">
+ <strong>下一篇：</strong><br/> 
+ <span>由简入繁阐述单例模式
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一-需求"><span class="toc-number">1.</span> <span class="toc-text">一.需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二-解决方案"><span class="toc-number">2.</span> <span class="toc-text">二.解决方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-实践"><span class="toc-number">3.</span> <span class="toc-text">三.实践</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四-总结"><span class="toc-number">4.</span> <span class="toc-text">四.总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考文献"><span class="toc-number">5.</span> <span class="toc-text">参考文献</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/LaTeX/" title="LaTeX">LaTeX<sup>2</sup></a></li>
+		
+			<li><a href="/categories/foobar/" title="foobar">foobar<sup>1</sup></a></li>
+		
+			<li><a href="/categories/日志/" title="日志">日志<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/foobar/" title="foobar">foobar<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
+		
+			<li><a href="/tags/webhook-flask/" title="webhook flask">webhook flask<sup>1</sup></a></li>
+		
+			<li><a href="/tags/LaTeX/" title="LaTeX">LaTeX<sup>1</sup></a></li>
+		
+			<li><a href="/tags/WinEdt/" title="WinEdt">WinEdt<sup>1</sup></a></li>
+		
+			<li><a href="/tags/日记/" title="日记">日记<sup>1</sup></a></li>
+		
+			<li><a href="/tags/成长/" title="成长">成长<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+      <li><a href="http://coolshell.cn/" target="_blank" title="CoolShell">CoolShell</a></li>
+	  <li><a href="http://it.deepinmind.com/index.html" target="_blank" title="DeepinMind">DeepinMind</a><li>
+	  <li><a href="http://mindhacks.cn/" target="_blank" title="MindHacks">MindHacks</a></li> 
+	  <li><a href="https://www.byvoid.com/" target="_blank" title="Beyond the Void">Beyond the Void</a></li> 
+	  <li><a href="http://rednaxelafx.iteye.com/" target="_blank" title="Script Ahead, Code Behind">Script Ahead,Code Behind</a></li> 
+	   <li><a href="http://wmbriggs.com/blog/" target="_blank" title="WILLIAM M. BRIGGS">WILLIAM M. BRIGGS</a></li> 
+	  </ul>
+</div>
+
+  <div class="pay">
+  <p class="asidetitle">赞助我</p>
+	<aside id="text-8" class="widget widget_text">
+	<br/>
+	<div align="center">
+	<div class="textwidget">
+	<form action="https://shenghuo.alipay.com/send/payment/fill.htm" method="POST" target="_blank" accept-charset="GBK"> <input name="optEmail" type="hidden" value="alexyyek@126.com"> 
+	<input name="payAmount" type="hidden" value="10">
+	<input name="title" type="hidden" value="赞助AlexYoung">
+	<input name="memo" type="hidden" value="感谢您的赞助">
+	<input name="pay" type="image" value="捐款" src="/img/alipay1.png">
+	</form>
+	</div>
+</aside>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+  <div align="center">
+<br/>
+	欢迎第
+	<a href="http://www.amazingcounters.com"><img border="0" src="http://cc.amazingcounters.com/counter.php?i=3183127&c=9549694" alt="AmazingCounters.com">
+	</a>
+	位访问者
+</div> 
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> If you love life, life will love you back. <br/>
+			 </p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/Deen12520" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:deen12520@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="https://deen12520.github.io/about" target="_blank" title="Deen12520">Deen12520</a>
+		
+		</p>
+
+		<script type="text/javascript">
+		  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+		  (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+		  e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+		  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+		  
+		  _st('install','XdWzZKnyGyQRz7gyu6Ki','2.0.0');
+		</script>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"ideEn"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'https://deen12520.github.io/js/embed.js';  
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+<!--  百度统计
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%69edb2848756110a4dbea314888241d5' type='text/javascript'%3E%3C/script%3E"));
+</script>
+-->
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?69edb2848756110a4dbea314888241d5";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script type="text/x-mathjax-config"> 
+MathJax.Hub.Config({ 
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]} 
+}); 
+</script>
+<script type="text/javascript"
+   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+<!-- 百度统计 -->
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%69edb2848756110a4dbea314888241d5' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+<div id="backtoTop" data-action="gototop" title="to_top">
+    <canvas id="backtoTopCanvas" width="48" height="48"></canvas>
+    <div class="percentage"></div>
+    <script src="/js/totop.js"></script>
+</div>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+  </body>
+</html>
