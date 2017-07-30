@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://deen12520.github.io/"/>
-  <updated>2017-05-28T04:42:13.755Z</updated>
+  <updated>2017-07-30T03:40:52.776Z</updated>
   <id>https://deen12520.github.io/</id>
   
   <author>
@@ -14,6 +14,66 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="https://deen12520.github.io/2017/07/30/Base64%20%E7%BC%96%E7%A0%81%E5%9B%BE%E7%89%87%E8%A2%AB%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C/"/>
+    <id>https://deen12520.github.io/2017/07/30/Base64 编码图片被自动换行/</id>
+    <published>2017-07-30T07:15:54.852Z</published>
+    <updated>2017-07-30T03:40:52.776Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="一-问题由来"><a href="#一-问题由来" class="headerlink" title="一.问题由来"></a><strong>一.问题由来</strong></h2><p>问题如题,这种情况在使用android 和 eclipse中都碰到.</p>
+<h3 id="1-环境介绍"><a href="#1-环境介绍" class="headerlink" title="1. 环境介绍"></a>1. 环境介绍</h3><p>android 中使用 import android.util.Base64.*;</p>
+<p>eclipse 中使用<br>import sun.misc.BASE64Encoder;<br>import sun.misc.BASE64Decoder;</p>
+<h3 id="2-问题详情"><a href="#2-问题详情" class="headerlink" title="2. 问题详情"></a>2. 问题详情</h3><p>使用Base64编码图片为字符串,发送给服务器,服务器收到的字符串是一段一段的,并不没有一次性接受所有的字符串.</p>
+<h2 id="二-查询资料"><a href="#二-查询资料" class="headerlink" title="二.查询资料"></a><strong>二.查询资料</strong></h2><p>为解决这个问题,我查询了base64的各种资料.</p>
+<h3 id="1-历史由来"><a href="#1-历史由来" class="headerlink" title="1.历史由来"></a>1.历史由来</h3><p>Java一直缺少BASE64编码API，以至于通常在项目开发中会选用第三方的API实现.</p>
+<p>刚开始,sun公司的sun.misc.BASE64Encoder的base64包使用较多,由于是公司内部使用,对外支持不好,时常出现导包错误,现在<strong>不推荐使用</strong>.</p>
+<p>详情参见oracle 公司的公告:   <a href="http://note.youdao.com/" target="_blank" rel="external">Why Developers Should Not Write Programs<br>That Call ‘sun’ Packages</a></p>
+<blockquote>
+<p>The sun.<em> packages are not part of the supported, public interface.<br>A Java program that directly calls into sun.</em> packages is not guaranteed to work on all Java-compatible platforms. In fact, such a program is not guaranteed to work even in future versions on the same platform.</p>
+</blockquote>
+<p>意思是sun.* 这样的包对java程序的支持不好,会导致程序不能工作.</p>
+<p>后来,oracle自己弄了一个base64的包,</p>
+<blockquote>
+<p>import org.apache.commons.codec.binary.Base64;</p>
+</blockquote>
+<p>这个包就没那么多问题,具体使用方法如下:</p>
+<blockquote>
+<p>byte[] encodedBytes = Base64.encodeBase64(“Test”.getBytes());<br>System.out.println(“encodedBytes “ + new String(encodedBytes));<br>byte[] decodedBytes = Base64.decodeBase64(encodedBytes);<br>System.out.println(“decodedBytes “ + new String(decodedBytes));</p>
+</blockquote>
+<p>再后来，Java 8实现了BASE64编解码API，它包含到java.util包,从此 base64 名正言顺.</p>
+<blockquote>
+<p>import java.util.Base64;</p>
+</blockquote>
+<p>具体使用如下:</p>
+<blockquote>
+<p>byte[] encodedBytes = Base64.getEncoder().encode(“Test”.getBytes());<br>System.out.println(“encodedBytes “ + new String(encodedBytes));<br>byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);<br>System.out.println(“decodedBytes “ + new String(decodedBytes));</p>
+</blockquote>
+<p>关于java 8 中base64 更详细的介绍请查看:<br><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Base64.html" target="_blank" rel="external">BASE64</a> 和 <a href="http://blog.csdn.net/chszs/article/details/17027649" target="_blank" rel="external">Java 8实现BASE64编解码</a></p>
+<h2 id="三-原因分析"><a href="#三-原因分析" class="headerlink" title="三.原因分析"></a><strong>三.原因分析</strong></h2><p>由于我使用sun.<em> 和 android.util.base64.</em>包,用Base64编码的时候如果出现\n 之类的字符，Java中转义。<br>当字符串过长（一般超过76）时会自动在中间加一个换行符，字符串最后也会加一个换行符。</p>
+<p>而现在使用的java.util.Base64; 没有这个特点.</p>
+<h2 id="四-解决方案"><a href="#四-解决方案" class="headerlink" title="四.解决方案"></a><strong>四.解决方案</strong></h2><p>对于eclipse, </p>
+<h3 id="1-继续使用sun-包"><a href="#1-继续使用sun-包" class="headerlink" title="1. 继续使用sun.* 包"></a>1. 继续使用sun.* 包</h3><p>重写base64 编码.</p>
+<p>具体实现可参照 <a href="http://www.blogjava.net/javacap/archive/2007/01/31/97014.html" target="_blank" rel="external">重写BASE64Encoder</a></p>
+<h3 id="2-换用其他包-比如-java-util-Base64包"><a href="#2-换用其他包-比如-java-util-Base64包" class="headerlink" title="2. 换用其他包,比如 java.util.Base64包"></a>2. 换用其他包,比如 java.util.Base64包</h3><p>具体使用方法请查看官网使用文档.</p>
+<p>对于android,</p>
+<p>将android.util.Base64.encodeToString(input, Base64.DEFAULT)<br>换成<br>Android.util.Base64.encodeToString(input, Base64.NO_WRAP);</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a><strong>参考资料</strong></h2><p>1.<a href="https://stackoverflow.com/questions/13109588/base64-encoding-in-java" target="_blank" rel="external">Base64 Encoding in Java
+</a></p>
+<p>2.<a href="http://blog.csdn.net/janronehoo/article/details/46774885" target="_blank" rel="external">Base64编码的 换行 转义</a></p>
+<p>3.<a href="http://blog.csdn.net/chszs/article/details/17027649" target="_blank" rel="external">Java 8实现BASE64编解码</a></p>
+<p>4.<a href="http://www.blogjava.net/javacap/archive/2007/01/31/97014.html" target="_blank" rel="external">重写BASE64Encoder</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;一-问题由来&quot;&gt;&lt;a href=&quot;#一-问题由来&quot; class=&quot;headerlink&quot; title=&quot;一.问题由来&quot;&gt;&lt;/a&gt;&lt;strong&gt;一.问题由来&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;问题如题,这种情况在使用android 和 eclipse中都碰到.&lt;/p
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>服务器向指定客户端发送消息</title>
