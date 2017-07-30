@@ -3,8 +3,8 @@
   
     
     <entry>
-      <title></title>
-      <url>/2017/07/30/Base64%20%E7%BC%96%E7%A0%81%E5%9B%BE%E7%89%87%E8%A2%AB%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C/</url>
+      <title><![CDATA[Base64 编码图片被自动换行]]></title>
+      <url>/2017/07/22/Base64%20%E7%BC%96%E7%A0%81%E5%9B%BE%E7%89%87%E8%A2%AB%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C/</url>
       <content type="html"><![CDATA[<h2 id="一-问题由来"><a href="#一-问题由来" class="headerlink" title="一.问题由来"></a><strong>一.问题由来</strong></h2><p>问题如题,这种情况在使用android 和 eclipse中都碰到.</p>
 <h3 id="1-环境介绍"><a href="#1-环境介绍" class="headerlink" title="1. 环境介绍"></a>1. 环境介绍</h3><p>android 中使用 import android.util.Base64.*;</p>
 <p>eclipse 中使用<br>import sun.misc.BASE64Encoder;<br>import sun.misc.BASE64Decoder;</p>

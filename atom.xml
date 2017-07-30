@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://deen12520.github.io/"/>
-  <updated>2017-07-30T03:40:52.776Z</updated>
+  <updated>2017-07-30T07:18:26.166Z</updated>
   <id>https://deen12520.github.io/</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title></title>
-    <link href="https://deen12520.github.io/2017/07/30/Base64%20%E7%BC%96%E7%A0%81%E5%9B%BE%E7%89%87%E8%A2%AB%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C/"/>
-    <id>https://deen12520.github.io/2017/07/30/Base64 编码图片被自动换行/</id>
-    <published>2017-07-30T07:15:54.852Z</published>
-    <updated>2017-07-30T03:40:52.776Z</updated>
+    <title>Base64 编码图片被自动换行</title>
+    <link href="https://deen12520.github.io/2017/07/22/Base64%20%E7%BC%96%E7%A0%81%E5%9B%BE%E7%89%87%E8%A2%AB%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C/"/>
+    <id>https://deen12520.github.io/2017/07/22/Base64 编码图片被自动换行/</id>
+    <published>2017-07-22T02:37:12.000Z</published>
+    <updated>2017-07-30T07:18:26.166Z</updated>
     
     <content type="html"><![CDATA[<h2 id="一-问题由来"><a href="#一-问题由来" class="headerlink" title="一.问题由来"></a><strong>一.问题由来</strong></h2><p>问题如题,这种情况在使用android 和 eclipse中都碰到.</p>
 <h3 id="1-环境介绍"><a href="#1-环境介绍" class="headerlink" title="1. 环境介绍"></a>1. 环境介绍</h3><p>android 中使用 import android.util.Base64.*;</p>
