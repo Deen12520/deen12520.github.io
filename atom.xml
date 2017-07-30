@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://deen12520.github.io/"/>
-  <updated>2017-05-28T04:42:13.754Z</updated>
+  <updated>2017-05-28T04:42:13.755Z</updated>
   <id>https://deen12520.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://deen12520.github.io/2017/05/28/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%90%91%E6%8C%87%E5%AE%9A%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF/"/>
     <id>https://deen12520.github.io/2017/05/28/服务器向指定客户端发送消息/</id>
     <published>2017-05-28T04:41:49.000Z</published>
-    <updated>2017-05-28T04:42:13.754Z</updated>
+    <updated>2017-05-28T04:42:13.755Z</updated>
     
     <content type="html"><![CDATA[<h2 id="一-需求"><a href="#一-需求" class="headerlink" title="一.需求"></a><strong>一.需求</strong></h2><p>需求如题. 当多个客户端连接服务器时,服务器如何给指定的客户端发送消息.</p>
 <h2 id="二-解决方案"><a href="#二-解决方案" class="headerlink" title="二.解决方案"></a><strong>二.解决方案</strong></h2><p>核心思想: 在服务器端,需保存不同客户端的socket列表及客户端相关信息.<br>socket含有发送方和接收方的ip和端口号,所以通过socket就能向指定的客户端发送消息.</p>
@@ -188,7 +188,7 @@
     <link href="https://deen12520.github.io/2017/04/08/Hexo-Permission-denied-publickey/"/>
     <id>https://deen12520.github.io/2017/04/08/Hexo-Permission-denied-publickey/</id>
     <published>2017-04-08T06:55:02.000Z</published>
-    <updated>2017-04-08T08:08:25.477Z</updated>
+    <updated>2017-04-08T08:08:25.478Z</updated>
     
     <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>hexo deploy 出现错误，如下：</p>
 <p><img src="http://img.blog.csdn.net/20170408114129902?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGluZ2RpbmdfMTIzNDU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Permission denied(publickey)"></p>
@@ -235,7 +235,7 @@
     <link href="https://deen12520.github.io/2017/04/08/%E7%BD%AE%E9%A1%B6-%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E6%B1%87%E6%80%BB%E7%9B%AE%E5%BD%95/"/>
     <id>https://deen12520.github.io/2017/04/08/置顶-博客文章汇总目录/</id>
     <published>2017-04-08T06:51:45.000Z</published>
-    <updated>2017-04-08T11:52:32.499Z</updated>
+    <updated>2017-04-08T11:52:32.500Z</updated>
     
     <content type="html"><![CDATA[<p>为了方便大家更好的梳理本博客的资源，更快的检索自己需要的博文，现将文章涉及的知识来源作如下归类，以后发表新的教程也会在本置顶帖内同步更新，后期考虑将加入更多的博客以外的资源链接，欢迎关注iDancy’s blog，与我一同成长。</p>
 <h1 id="Python-系列"><a href="#Python-系列" class="headerlink" title="Python 系列"></a>Python 系列</h1><h1 id="算法系列"><a href="#算法系列" class="headerlink" title="算法系列"></a>算法系列</h1><h1 id="数据挖掘系列"><a href="#数据挖掘系列" class="headerlink" title="数据挖掘系列"></a>数据挖掘系列</h1><h1 id="工具系列"><a href="#工具系列" class="headerlink" title="工具系列"></a>工具系列</h1>]]></content>
@@ -432,7 +432,7 @@
     <link href="https://deen12520.github.io/2017/03/20/%E4%BF%AE%E6%94%B9%E5%9B%9E%E5%88%B0%E9%A1%B6%E9%83%A8%E6%8C%89%E9%92%AE/"/>
     <id>https://deen12520.github.io/2017/03/20/修改回到顶部按钮/</id>
     <published>2017-03-20T03:04:47.000Z</published>
-    <updated>2017-03-20T03:08:15.815Z</updated>
+    <updated>2017-03-20T03:08:15.816Z</updated>
     
     <content type="html"><![CDATA[<h2 id="回到顶部按钮"><a href="#回到顶部按钮" class="headerlink" title="回到顶部按钮"></a><strong>回到顶部按钮</strong></h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a><strong>前言</strong></h3><p>最近学习使用Hexo搭建了一个<a href="https://deen12520.github.io">博客</a>，theme 使用的是<a href="https://github.com/Deen12520/geekman" target="_blank" rel="external">geekman</a>(在jakman基础修改的一个版本)。</p>
 <p>在博客中加入了回到顶部，偶然一次看到<a href="https://unnamed42.github.io/2016-09-10-Hexo%E6%8A%98%E8%85%BE%E7%AC%94%E8%AE%B0.html" target="_blank" rel="external">Hexo 折腾笔记</a>中的回到顶部的百分比样式的按钮效果，很炫酷，所以自己动手照着教程造了轮子，具体效果可进本人博客查看 <a href="https://deen12520.github.io/">iDanCy</a>。</p>
@@ -463,8 +463,8 @@
     <title>Hello World</title>
     <link href="https://deen12520.github.io/2017/02/28/hello-world/"/>
     <id>https://deen12520.github.io/2017/02/28/hello-world/</id>
-    <published>2017-02-28T11:05:02.442Z</published>
-    <updated>2017-02-28T11:05:02.443Z</updated>
+    <published>2017-02-28T11:05:02.443Z</published>
+    <updated>2017-02-28T11:05:02.444Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
 <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
