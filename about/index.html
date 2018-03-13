@@ -49,7 +49,7 @@
 				<h1 class="site-name"><a href="/" title="iDanCy">iDanCy</a></h1>
 				<h2 class="blog-motto">Nothing is more.</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -89,7 +89,7 @@
 		<a href="https://deen12520.github.io/about" title="Deen12520" target="_blank" itemprop="author">Deen12520</a>
 		
   <p class="article-time">
-    <time datetime="2017-03-11T03:00:37.000Z" itemprop="datePublished"> 发表于 2017-03-11</time>
+    <time datetime="2017-03-11T03:00:37.000Z" itemprop="datePublished"> Published 2017-03-11</time>
     
   </p>
 </header>
@@ -264,6 +264,31 @@ $(document).ready(function(){
          </a>
        </span>
    </span>
+
+
+
+
+<script type="text/javascript">
+_hcwp = window._hcwp || [];
+
+_hcwp.push({widget:"Bloggerstream", widget_id: {{ theme.hypercomments_id }}, selector:".hc-comment-count", label: "{\%COUNT%\}" });
+
+_hcwp.push({widget:"Stream", widget_id: {{ theme.hypercomments_id }}, xid: "{{ page.path }}"});
+
+
+var hypercomments_id = '102436';
+
+
+(function() {
+    if("HC_LOAD_INIT" in window)return;
+    HC_LOAD_INIT = true;
+    var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+    var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+    hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/{{ theme.hypercomments_id }}/"+lang+"/widget.js";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hcc, s.nextSibling);
+    })();
+    </script>
 
 
 
