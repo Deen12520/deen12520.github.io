@@ -54,6 +54,8 @@
 					
 						<li><a href="/about">关于 | About</a></li>
 					
+						<li><a href="/resume">Resume</a></li>
+					
 					<li>
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
@@ -140,27 +142,16 @@
 </nav>
 
 	
-<!--PC和WAP自适应版-->
-<!--
-<div id="SOHUCS" sid="请将此处替换为配置SourceID的语句" ></div> 
-<script type="text/javascript"> 
-(function(){ 
-var appid = 'cyt5z92xf'; 
-var conf = 'prod_87e090c69731e6d9a00bbd96aa66e19f'; 
-var width = window.innerWidth || document.documentElement.clientWidth; 
-if (width < 960) { 
-window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("http://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
-
--->
-<div id="uyan_frame"></div>
-<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2140268"></script>
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
 
 
+<section class="comment">
+  <div id="hypercomments_widget">
+  </div>
+</section>
 
-<!--
-
-
--->
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
@@ -195,7 +186,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
 	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
+			<li><a href="/tags/成长/" title="成长">成长<sup>1</sup></a></li>
 		
 			<li><a href="/tags/LaTeX/" title="LaTeX">LaTeX<sup>1</sup></a></li>
 		
@@ -203,9 +194,9 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
 		
 			<li><a href="/tags/日记/" title="日记">日记<sup>1</sup></a></li>
 		
-			<li><a href="/tags/成长/" title="成长">成长<sup>1</sup></a></li>
-		
 			<li><a href="/tags/foobar/" title="foobar">foobar<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
 		
 			<li><a href="/tags/webhook-flask/" title="webhook flask">webhook flask<sup>1</sup></a></li>
 		
@@ -232,11 +223,11 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
 	<br/>
 	<div align="center">
 	<div class="textwidget">
-	<form action="https://shenghuo.alipay.com/send/payment/fill.htm" method="POST" target="_blank" accept-charset="GBK"> <input name="optEmail" type="hidden" value="alexyyek@126.com"> 
+	<form action="https://shenghuo.alipay.com/send/payment/fill.htm" method="POST" target="_blank" accept-charset="GBK"> <input name="optEmail" type="hidden" value="deen12520@gmail.com"> 
 	<input name="payAmount" type="hidden" value="10">
-	<input name="title" type="hidden" value="赞助AlexYoung">
+	<input name="title" type="hidden" value="赞助Deen">
 	<input name="memo" type="hidden" value="感谢您的赞助">
-	<input name="pay" type="image" value="捐款" src="/img/alipay1.png">
+	<input name="pay" type="image" value="捐款" src="/img/wexinpay.jpg">
 	</form>
 	</div>
 </aside>
@@ -287,7 +278,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
 		<a href="mailto:deen12520@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
 		
 	</div>
-		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2018 
 		
 		<a href="https://deen12520.github.io/about" target="_blank" title="Deen12520">Deen12520</a>
 		
@@ -421,6 +412,28 @@ $(document).ready(function(){
 
 -->
 
+
+<script type="text/javascript">
+_hcwp = window._hcwp || [];
+
+_hcwp.push({widget:"Bloggerstream", widget_id: {{ theme.hypercomments_id }}, selector:".hc-comment-count", label: "{\%COUNT%\}" });
+
+_hcwp.push({widget:"Stream", widget_id: {{ theme.hypercomments_id }}, xid: "{{ page.path }}"});
+
+
+var hypercomments_id = '102436';
+
+
+(function() {
+    if("HC_LOAD_INIT" in window)return;
+    HC_LOAD_INIT = true;
+    var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+    var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+    hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/{{ theme.hypercomments_id }}/"+lang+"/widget.js";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hcc, s.nextSibling);
+    })();
+    </script>
 
 
 
