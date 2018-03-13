@@ -172,10 +172,21 @@ eclipse 中使用import sun.misc.BASE64Encoder;import sun.misc.BAS">
 
 	
 
-<section class="comment">
-  <div id="hypercomments_widget">
-  </div>
-</section>
+  <div id="hypercomments_widget"></div>
+<script type="text/javascript">
+_hcwp = window._hcwp || [];
+_hcwp.push({widget:"Stream", widget_id: 102436});
+(function() {
+if("HC_LOAD_INIT" in window)return;
+HC_LOAD_INIT = true;
+var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/102436/"+lang+"/widget.js";
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hcc, s.nextSibling);
+})();
+</script>
+<a href="http://hypercomments.com" class="hc-link" title="comments widget">comments powered by HyperComments</a>
 
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
@@ -213,17 +224,17 @@ eclipse 中使用import sun.misc.BASE64Encoder;import sun.misc.BAS">
 		
 			<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
 		
-			<li><a href="/tags/webhook-flask/" title="webhook flask">webhook flask<sup>1</sup></a></li>
-		
 			<li><a href="/tags/foobar/" title="foobar">foobar<sup>1</sup></a></li>
 		
-			<li><a href="/tags/成长/" title="成长">成长<sup>1</sup></a></li>
+			<li><a href="/tags/webhook-flask/" title="webhook flask">webhook flask<sup>1</sup></a></li>
 		
 			<li><a href="/tags/LaTeX/" title="LaTeX">LaTeX<sup>1</sup></a></li>
 		
 			<li><a href="/tags/WinEdt/" title="WinEdt">WinEdt<sup>1</sup></a></li>
 		
 			<li><a href="/tags/日记/" title="日记">日记<sup>1</sup></a></li>
+		
+			<li><a href="/tags/成长/" title="成长">成长<sup>1</sup></a></li>
 		
 		</ul>
 </div>
@@ -431,42 +442,6 @@ $(document).ready(function(){
 </script>
 
 
-
-
-<span class="post-comments-count">+
-     &nbsp;|&nbsp;
-       <span class="post-meta-item-icon">
-         <i class="fa fa-comment-o"></i>
-         <a href="{{ url_for(post.path) }}#comments" itemprop="discussionUrl">
-           <span class="post-comments-count hc-comment-count" data-xid="{{ post.path }}" itemprop="commentsCount"></span>
-         </a>
-       </span>
-   </span>
-
-
-
-
-<script type="text/javascript">
-_hcwp = window._hcwp || [];
-
-_hcwp.push({widget:"Bloggerstream", widget_id: {{ theme.hypercomments_id }}, selector:".hc-comment-count", label: "{\%COUNT%\}" });
-
-_hcwp.push({widget:"Stream", widget_id: {{ theme.hypercomments_id }}, xid: "{{ page.path }}"});
-
-
-var hypercomments_id = '102436';
-
-
-(function() {
-    if("HC_LOAD_INIT" in window)return;
-    HC_LOAD_INIT = true;
-    var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
-    var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
-    hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/{{ theme.hypercomments_id }}/"+lang+"/widget.js";
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(hcc, s.nextSibling);
-    })();
-    </script>
 
 
 
