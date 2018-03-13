@@ -257,12 +257,19 @@ $(document).ready(function(){
 </script>
 
 
-<!--
 
-<div id="uyan_frame"></div>
-<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2140268"></script>
 
--->
+<span class="post-comments-count">+
+     &nbsp;|&nbsp;
+       <span class="post-meta-item-icon">
+         <i class="fa fa-comment-o"></i>
+         <a href="{{ url_for(post.path) }}#comments" itemprop="discussionUrl">
+           <span class="post-comments-count hc-comment-count" data-xid="{{ post.path }}" itemprop="commentsCount"></span>
+         </a>
+       </span>
+   </span>
+
+
 
 
 <script type="text/javascript">
@@ -286,6 +293,7 @@ var hypercomments_id = '102436';
     s.parentNode.insertBefore(hcc, s.nextSibling);
     })();
     </script>
+    <a href="http://hypercomments.com" class="hc-link" title="comments widget">comments powered by HyperComments</a>
 
 
 
